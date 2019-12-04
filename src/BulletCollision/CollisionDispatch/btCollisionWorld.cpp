@@ -648,6 +648,8 @@ void btCollisionWorld::objectQuerySingleInternal(const btConvexShape* castShape,
 						castResult.m_hitPoint,
 						castResult.m_fraction);
 
+					localConvexResult.m_penetrationDepth = castResult.m_penetrationDepth;
+
 					bool normalInWorldSpace = true;
 					resultCallback.addSingleResult(localConvexResult, normalInWorldSpace);
 				}

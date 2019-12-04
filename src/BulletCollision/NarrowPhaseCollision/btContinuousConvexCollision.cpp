@@ -144,6 +144,9 @@ bool btContinuousConvexCollision::calcTimeOfImpact(
 		if ((projectedLinearVelocity + maxAngularProjectedVelocity) <= SIMD_EPSILON)
 			return false;
 
+		if (dist < btScalar(0))
+			result.m_penetrationDepth = -dist;
+
 		//not close enough
 		while (dist > radius)
 		{

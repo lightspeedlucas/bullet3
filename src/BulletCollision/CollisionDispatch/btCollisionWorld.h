@@ -324,6 +324,7 @@ public:
 		btVector3 m_hitNormalLocal;
 		btVector3 m_hitPointLocal;
 		btScalar m_hitFraction;
+		btScalar m_penetrationDepth;
 	};
 
 	///RayResultCallback is used to report new raycast results

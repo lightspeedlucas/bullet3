@@ -58,6 +58,7 @@ public:
 			: m_fraction(btScalar(BT_LARGE_FLOAT)),
 			  m_debugDrawer(0),
 			  m_allowedPenetration(btScalar(0)),
+			  m_penetrationDepth(btScalar(0)),
 			  m_subSimplexCastMaxIterations(MAX_CONVEX_CAST_ITERATIONS),
 			  m_subSimplexCastEpsilon(MAX_CONVEX_CAST_EPSILON)
 		{
@@ -72,6 +73,7 @@ public:
 		btScalar m_fraction;  //input and output
 		btIDebugDraw* m_debugDrawer;
 		btScalar m_allowedPenetration;
+		btScalar m_penetrationDepth;
 		
 		int m_subSimplexCastMaxIterations;
 		btScalar m_subSimplexCastEpsilon;
