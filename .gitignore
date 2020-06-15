@@ -30,3 +30,4 @@ CTestTestFile.cmake
 *.vcxproj
 *.vcxproj.filters
 *.sln
+*.o
