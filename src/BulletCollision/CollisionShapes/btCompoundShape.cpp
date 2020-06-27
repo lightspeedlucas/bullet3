@@ -305,7 +305,7 @@ const char* btCompoundShape::serialize(void* dataBuffer, btSerializer* serialize
 	btCompoundShapeData* shapeData = (btCompoundShapeData*)dataBuffer;
 	btCollisionShape::serialize(&shapeData->m_collisionShapeData, serializer);
 
-	shapeData->m_collisionMargin = float(m_collisionMargin);
+	shapeData->m_collisionMargin = m_collisionMargin.ToFloat();
 	shapeData->m_numChildShapes = m_children.size();
 	shapeData->m_childShapePtr = 0;
 	if (shapeData->m_numChildShapes)
@@ -316,7 +316,7 @@ const char* btCompoundShape::serialize(void* dataBuffer, btSerializer* serialize
 
 		for (int i = 0; i < shapeData->m_numChildShapes; i++, memPtr++)
 		{
-			memPtr->m_childMargin = float(m_children[i].m_childMargin);
+			memPtr->m_childMargin = m_children[i].m_childMargin.ToFloat();
 			memPtr->m_childShape = (btCollisionShapeData*)serializer->getUniquePointer(m_children[i].m_childShape);
 			//don't serialize shapes that already have been serialized
 			if (!serializer->findPointer(m_children[i].m_childShape))

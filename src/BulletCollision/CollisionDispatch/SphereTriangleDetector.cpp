@@ -64,7 +64,7 @@ btScalar SegmentSqrDistance(const btVector3& from, const btVector3& to, const bt
 	btVector3 v = to - from;
 	btScalar t = v.dot(diff);
 
-	if (t > 0)
+	if (t > btScalar(0))
 	{
 		btScalar dotVV = v.dot(v);
 		if (t < dotVV)
@@ -106,7 +106,7 @@ bool SphereTriangleDetector::collide(const btVector3& sphereCenter, btVector3& p
 	bool hasContact = false;
 	btVector3 contactPoint;
 
-	if (l2 >= SIMD_EPSILON * SIMD_EPSILON)
+	if (l2 >= btScalar(SIMD_EPSILON) * btScalar(SIMD_EPSILON))
 	{
 		normal /= btSqrt(l2);
 
@@ -165,7 +165,7 @@ bool SphereTriangleDetector::collide(const btVector3& sphereCenter, btVector3& p
 
 		if (distanceSqr < radiusWithThreshold * radiusWithThreshold)
 		{
-			if (distanceSqr > SIMD_EPSILON)
+			if (distanceSqr > btScalar(SIMD_EPSILON))
 			{
 				btScalar distance = btSqrt(distanceSqr);
 				resultNormal = contactToCentre;
@@ -208,8 +208,8 @@ bool SphereTriangleDetector::pointInTriangle(const btVector3 vertices[], const b
 	r1 = edge1_normal.dot(p1_to_p);
 	r2 = edge2_normal.dot(p2_to_p);
 	r3 = edge3_normal.dot(p3_to_p);
-	if ((r1 > 0 && r2 > 0 && r3 > 0) ||
-		(r1 <= 0 && r2 <= 0 && r3 <= 0))
+	if ((r1 > btScalar(0) && r2 > btScalar(0) && r3 > btScalar(0)) ||
+		(r1 <= btScalar(0) && r2 <= btScalar(0) && r3 <= btScalar(0)))
 		return true;
 	return false;
 }

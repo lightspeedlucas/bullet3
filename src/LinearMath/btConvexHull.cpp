@@ -115,7 +115,7 @@ btScalar DistanceBetweenLines(const btVector3 &ustart, const btVector3 &udir, co
 
 	btScalar distu = -btDot(cp, ustart);
 	btScalar distv = -btDot(cp, vstart);
-	btScalar dist = (btScalar)fabs(distu - distv);
+	btScalar dist = btFabs(distu - distv);
 	if (upoint)
 	{
 		btPlane plane;
@@ -831,7 +831,7 @@ bool HullLibrary::CleanupVertices(unsigned int svcount,
 
 	m_vertexIndexMapping.resize(0);
 
-#define EPSILON btScalar(0.000001) /* close enough to consider two btScalaring point numbers to be 'the same'. */
+#define EPSILON btScalar(0.00002) /* close enough to consider two btScalaring point numbers to be 'the same'. */
 
 	vcount = 0;
 
@@ -844,8 +844,8 @@ bool HullLibrary::CleanupVertices(unsigned int svcount,
 		scale[2] = 1;
 	}
 
-	btScalar bmin[3] = {FLT_MAX, FLT_MAX, FLT_MAX};
-	btScalar bmax[3] = {-FLT_MAX, -FLT_MAX, -FLT_MAX};
+	btScalar bmin[3] = {btScalar(99999999999LL), btScalar(99999999999LL), btScalar(99999999999LL)};
+	btScalar bmax[3] = {-btScalar(99999999999LL), -btScalar(99999999999LL), -btScalar(99999999999LL)};
 
 	const char *vtx = (const char *)svertices;
 
@@ -877,13 +877,13 @@ bool HullLibrary::CleanupVertices(unsigned int svcount,
 
 	if (dx < EPSILON || dy < EPSILON || dz < EPSILON || svcount < 3)
 	{
-		btScalar len = FLT_MAX;
+		btScalar len = btScalar(99999999999LL);
 
 		if (dx > EPSILON && dx < len) len = dx;
 		if (dy > EPSILON && dy < len) len = dy;
 		if (dz > EPSILON && dz < len) len = dz;
 
-		if (len == FLT_MAX)
+		if (len == btScalar(99999999999LL))
 		{
 			dx = dy = dz = btScalar(0.01);  // one centimeter
 		}
@@ -922,9 +922,9 @@ bool HullLibrary::CleanupVertices(unsigned int svcount,
 			scale[1] = dy;
 			scale[2] = dz;
 
-			recip[0] = 1 / dx;
-			recip[1] = 1 / dy;
-			recip[2] = 1 / dz;
+			recip[0] = btScalar(1) / dx;
+			recip[1] = btScalar(1) / dy;
+			recip[2] = btScalar(1) / dz;
 
 			center[0] *= recip[0];
 			center[1] *= recip[1];
@@ -1002,8 +1002,8 @@ bool HullLibrary::CleanupVertices(unsigned int svcount,
 	// ok..now make sure we didn't prune so many vertices it is now invalid.
 	//	if ( 1 )
 	{
-		btScalar bmin[3] = {FLT_MAX, FLT_MAX, FLT_MAX};
-		btScalar bmax[3] = {-FLT_MAX, -FLT_MAX, -FLT_MAX};
+		btScalar bmin[3] = {btScalar(99999999999LL), btScalar(99999999999LL), btScalar(99999999999LL)};
+		btScalar bmax[3] = {-btScalar(99999999999LL), -btScalar(99999999999LL), -btScalar(99999999999LL)};
 
 		for (unsigned int i = 0; i < vcount; i++)
 		{
@@ -1025,13 +1025,13 @@ bool HullLibrary::CleanupVertices(unsigned int svcount,
 			btScalar cy = dy * btScalar(0.5) + bmin[1];
 			btScalar cz = dz * btScalar(0.5) + bmin[2];
 
-			btScalar len = FLT_MAX;
+			btScalar len = btScalar(99999999999LL);
 
 			if (dx >= EPSILON && dx < len) len = dx;
 			if (dy >= EPSILON && dy < len) len = dy;
 			if (dz >= EPSILON && dz < len) len = dz;
 
-			if (len == FLT_MAX)
+			if (len == btScalar(99999999999LL))
 			{
 				dx = dy = dz = btScalar(0.01);  // one centimeter
 			}

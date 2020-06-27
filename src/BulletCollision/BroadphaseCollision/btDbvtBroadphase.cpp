@@ -335,9 +335,9 @@ void btDbvtBroadphase::setAabb(btBroadphaseProxy* absproxy,
 
 				const btVector3 delta = aabbMin - proxy->m_aabbMin;
 				btVector3 velocity(((proxy->m_aabbMax - proxy->m_aabbMin) / 2) * m_prediction);
-				if (delta[0] < 0) velocity[0] = -velocity[0];
-				if (delta[1] < 0) velocity[1] = -velocity[1];
-				if (delta[2] < 0) velocity[2] = -velocity[2];
+				if (delta[0] < btScalar(0)) velocity[0] = -velocity[0];
+				if (delta[1] < btScalar(0)) velocity[1] = -velocity[1];
+				if (delta[2] < btScalar(0)) velocity[2] = -velocity[2];
 				if (
 					m_sets[0].update(proxy->leaf, aabb, velocity, gDbvtMargin)
 
@@ -613,7 +613,7 @@ void btDbvtBroadphase::collide(btDispatcher* dispatcher)
 	m_needcleanup = false;
 	if (m_updates_call > 0)
 	{
-		m_updates_ratio = m_updates_done / (btScalar)m_updates_call;
+		m_updates_ratio = btScalar(m_updates_done) / btScalar(m_updates_call);
 	}
 	else
 	{

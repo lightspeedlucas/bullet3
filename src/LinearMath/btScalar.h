@@ -23,6 +23,7 @@ subject to the following restrictions:
 #include <math.h>
 #include <stdlib.h>  //size_t for MSVC 6.0
 #include <float.h>
+#include "Q.h"
 
 /* SVN $Revision$ on $Date$ from http://bullet.googlecode.com*/
 #define BT_BULLET_VERSION 289
@@ -306,9 +307,9 @@ inline int btIsDoublePrecision()
 	//this number could be bigger in double precision
 	#define BT_LARGE_FLOAT 1e30
 #else
-	typedef float btScalar;
+	typedef Q btScalar;
 	//keep BT_LARGE_FLOAT*BT_LARGE_FLOAT < FLT_MAX
-	#define BT_LARGE_FLOAT 1e18f
+	#define BT_LARGE_FLOAT 8388608
 #endif
 
 #ifdef BT_USE_SSE
@@ -486,20 +487,20 @@ inline int btIsDoublePrecision()
 		return x * y;
 	#endif
 	#else
-		return sqrtf(y);
+		return Q::Sqrt(y);
 	#endif
 	}
-	SIMD_FORCE_INLINE btScalar btFabs(btScalar x) { return fabsf(x); }
-	SIMD_FORCE_INLINE btScalar btCos(btScalar x) { return cosf(x); }
-	SIMD_FORCE_INLINE btScalar btSin(btScalar x) { return sinf(x); }
-	SIMD_FORCE_INLINE btScalar btTan(btScalar x) { return tanf(x); }
+	SIMD_FORCE_INLINE btScalar btFabs(btScalar x) { return Q::Abs(x); }
+	SIMD_FORCE_INLINE btScalar btCos(btScalar x) { return Q::Cos(x); }
+	SIMD_FORCE_INLINE btScalar btSin(btScalar x) { return Q::Sin(x); }
+	SIMD_FORCE_INLINE btScalar btTan(btScalar x) { return Q::Tan(x); }
 	SIMD_FORCE_INLINE btScalar btAcos(btScalar x)
 	{
 		if (x < btScalar(-1))
 			x = btScalar(-1);
 		if (x > btScalar(1))
 			x = btScalar(1);
-		return acosf(x);
+		return Q::Acos(x);
 	}
 	SIMD_FORCE_INLINE btScalar btAsin(btScalar x)
 	{
@@ -507,14 +508,14 @@ inline int btIsDoublePrecision()
 			x = btScalar(-1);
 		if (x > btScalar(1))
 			x = btScalar(1);
-		return asinf(x);
+		return Q::Asin(x);
 	}
-	SIMD_FORCE_INLINE btScalar btAtan(btScalar x) { return atanf(x); }
-	SIMD_FORCE_INLINE btScalar btAtan2(btScalar x, btScalar y) { return atan2f(x, y); }
-	SIMD_FORCE_INLINE btScalar btExp(btScalar x) { return expf(x); }
-	SIMD_FORCE_INLINE btScalar btLog(btScalar x) { return logf(x); }
-	SIMD_FORCE_INLINE btScalar btPow(btScalar x, btScalar y) { return powf(x, y); }
-	SIMD_FORCE_INLINE btScalar btFmod(btScalar x, btScalar y) { return fmodf(x, y); }
+	SIMD_FORCE_INLINE btScalar btAtan(btScalar x) { return Q::Atan(x); }
+	SIMD_FORCE_INLINE btScalar btAtan2(btScalar x, btScalar y) { return Q::Atan2(x, y); }
+	SIMD_FORCE_INLINE btScalar btExp(btScalar x) { return Q::Exp(x); }
+	SIMD_FORCE_INLINE btScalar btLog(btScalar x) { return Q::Log(x); }
+	SIMD_FORCE_INLINE btScalar btPow(btScalar x, btScalar y) { return Q::Pow(x, y); }
+	SIMD_FORCE_INLINE btScalar btFmod(btScalar x, btScalar y) { return Q::Fmod(x, y); }
 
 #endif//BT_USE_DOUBLE_PRECISION
 
@@ -535,8 +536,8 @@ inline int btIsDoublePrecision()
 	#define BT_TWO 2.0
 	#define BT_HALF 0.5
 #else
-	#define SIMD_EPSILON FLT_EPSILON
-	#define SIMD_INFINITY FLT_MAX
+	#define SIMD_EPSILON 0.00002
+	#define SIMD_INFINITY 0x7FFFFFFFFFFFLL
 	#define BT_ONE 1.0f
 	#define BT_ZERO 0.0f
 	#define BT_TWO 2.0f
@@ -547,11 +548,11 @@ inline int btIsDoublePrecision()
 
 SIMD_FORCE_INLINE btScalar btAtan2Fast(btScalar y, btScalar x)
 {
-	btScalar coeff_1 = SIMD_PI / 4.0f;
-	btScalar coeff_2 = 3.0f * coeff_1;
+	btScalar coeff_1 = SIMD_PI / btScalar(4.0f);
+	btScalar coeff_2 = btScalar(3.0f) * coeff_1;
 	btScalar abs_y = btFabs(y);
 	btScalar angle;
-	if (x >= 0.0f)
+	if (x >= btScalar(0))
 	{
 		btScalar r = (x - abs_y) / (x + abs_y);
 		angle = coeff_1 - coeff_1 * r;
@@ -561,10 +562,10 @@ SIMD_FORCE_INLINE btScalar btAtan2Fast(btScalar y, btScalar x)
 		btScalar r = (x + abs_y) / (abs_y - x);
 		angle = coeff_2 - coeff_1 * r;
 	}
-	return (y < 0.0f) ? -angle : angle;
+	return (y < btScalar(0)) ? -angle : angle;
 }
 
-SIMD_FORCE_INLINE bool btFuzzyZero(btScalar x) { return btFabs(x) < SIMD_EPSILON; }
+SIMD_FORCE_INLINE bool btFuzzyZero(btScalar x) { return btFabs(x) < btScalar(SIMD_EPSILON); }
 
 SIMD_FORCE_INLINE bool btEqual(btScalar a, btScalar eps)
 {
@@ -592,7 +593,7 @@ SIMD_FORCE_INLINE btScalar btDegrees(btScalar x) { return x * SIMD_DEGS_PER_RAD;
 #ifndef btFsel
 SIMD_FORCE_INLINE btScalar btFsel(btScalar a, btScalar b, btScalar c)
 {
-	return a >= 0 ? b : c;
+	return a >= btScalar(0) ? b : c;
 }
 #endif
 #define btFsels(a, b, c) (btScalar) btFsel(a, b, c)

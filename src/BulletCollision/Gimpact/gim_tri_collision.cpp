@@ -201,12 +201,12 @@ public:
 		GREAL Dlen;
 		VEC_LENGTH(edge_edge_dir, Dlen);
 
-		if (Dlen < 0.0001)
+		if (Dlen < btScalar(0.0001))
 		{
 			return 0;  //faces near paralele
 		}
 
-		edge_edge_dir *= 1 / Dlen;  //normalize
+		edge_edge_dir *= btScalar(1) / Dlen;  //normalize
 
 		// Compute interval for triangle 1
 		GUINT tu_e0, tu_e1;              //edge indices
@@ -235,8 +235,8 @@ public:
 		sort_isect(isect_u[0], isect_u[1], tu_e0, tu_e1, up_e0, up_e1);
 		sort_isect(isect_v[0], isect_v[1], tv_e0, tv_e1, vp_e0, vp_e1);
 
-		const GREAL midpoint_u = 0.5f * (isect_u[0] + isect_u[1]);  // midpoint
-		const GREAL midpoint_v = 0.5f * (isect_v[0] + isect_v[1]);  // midpoint
+		const GREAL midpoint_u = btScalar(0.5f) * (isect_u[0] + isect_u[1]);  // midpoint
+		const GREAL midpoint_v = btScalar(0.5f) * (isect_v[0] + isect_v[1]);  // midpoint
 
 		if (midpoint_u < midpoint_v)
 		{
@@ -263,7 +263,7 @@ public:
 
 				edge_edge_dir = closest_point_u - closest_point_v;
 				VEC_LENGTH(edge_edge_dir, distances[2]);
-				edge_edge_dir *= 1.0f / distances[2];  // normalize
+				edge_edge_dir *= btScalar(1) / distances[2];  // normalize
 			}
 			else
 			{
@@ -296,7 +296,7 @@ public:
 
 				edge_edge_dir = closest_point_u - closest_point_v;
 				VEC_LENGTH(edge_edge_dir, distances[2]);
-				edge_edge_dir *= 1.0f / distances[2];  // normalize
+				edge_edge_dir *= btScalar(1) / distances[2];  // normalize
 			}
 			else
 			{
@@ -351,7 +351,7 @@ public:
 
 				//reorder triangle v
 				VEC_SWAP(tv_vertices[0], tv_vertices[1]);
-				VEC_SCALE_4(tv_plane, -1.0f, tv_plane);
+				VEC_SCALE_4(tv_plane, btScalar(-1), tv_plane);
 			}
 			else
 			{
@@ -362,13 +362,13 @@ public:
 		else
 		{
 			//Look if we need to invert the triangle
-			distances[0] = (du[0] + du[1] + du[2]) / 3.0f;  //centroid
+			distances[0] = (du[0] + du[1] + du[2]) / btScalar(3);  //centroid
 
-			if (distances[0] < 0.0f)
+			if (distances[0] < btScalar(0.0f))
 			{
 				//reorder triangle v
 				VEC_SWAP(tv_vertices[0], tv_vertices[1]);
-				VEC_SCALE_4(tv_plane, -1.0f, tv_plane);
+				VEC_SCALE_4(tv_plane, btScalar(-1), tv_plane);
 
 				distances[0] = GIM_MAX3(du[0], du[1], du[2]);
 				distances[0] = -distances[0];
@@ -400,7 +400,7 @@ public:
 
 				//reorder triangle u
 				VEC_SWAP(tu_vertices[0], tu_vertices[1]);
-				VEC_SCALE_4(tu_plane, -1.0f, tu_plane);
+				VEC_SCALE_4(tu_plane, btScalar(-1), tu_plane);
 			}
 			else
 			{
@@ -417,7 +417,7 @@ public:
 			{
 				//reorder triangle v
 				VEC_SWAP(tu_vertices[0], tu_vertices[1]);
-				VEC_SCALE_4(tu_plane, -1.0f, tu_plane);
+				VEC_SCALE_4(tu_plane, btScalar(-1), tu_plane);
 
 				distances[1] = GIM_MAX3(dv[0], dv[1], dv[2]);
 				distances[1] = -distances[1];

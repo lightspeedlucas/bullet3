@@ -269,7 +269,7 @@ const char* btGImpactMeshShape::serialize(void* dataBuffer, btSerializer* serial
 
 	m_meshInterface->serialize(&trimeshData->m_meshInterface, serializer);
 
-	trimeshData->m_collisionMargin = float(m_collisionMargin);
+	trimeshData->m_collisionMargin = m_collisionMargin.ToFloat();
 
 	localScaling.serializeFloat(trimeshData->m_localScaling);
 

@@ -74,7 +74,7 @@ void btSphereSphereCollisionAlgorithm::processCollision(const btCollisionObjectW
 	btScalar dist = len - (radius0 + radius1);
 
 	btVector3 normalOnSurfaceB(1, 0, 0);
-	if (len > SIMD_EPSILON)
+	if (len > btScalar(SIMD_EPSILON))
 	{
 		normalOnSurfaceB = diff / len;
 	}

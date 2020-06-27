@@ -45,7 +45,7 @@ void GIM_TRIANGLE_CONTACT::merge_points(const btVector4& plane,
 				point_indices[0] = _k;
 				m_point_count = 1;
 			}
-			else if ((_dist + SIMD_EPSILON) >= m_penetration_depth)
+			else if ((_dist + btScalar(SIMD_EPSILON)) >= m_penetration_depth)
 			{
 				point_indices[m_point_count] = _k;
 				m_point_count++;

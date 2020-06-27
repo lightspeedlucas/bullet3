@@ -29,7 +29,7 @@ btConvexPolyhedron::~btConvexPolyhedron()
 
 inline bool IsAlmostZero1(const btVector3& v)
 {
-	if (btFabs(v.x()) > 1e-6 || btFabs(v.y()) > 1e-6 || btFabs(v.z()) > 1e-6) return false;
+	if (btFabs(v.x()) > btScalar(1e-6) || btFabs(v.y()) > btScalar(1e-6) || btFabs(v.z()) > btScalar(1e-6)) return false;
 	return true;
 }
 
@@ -94,7 +94,7 @@ bool btConvexPolyhedron::testContainment() const
 		{
 			const btVector3 Normal(m_faces[i].m_plane[0], m_faces[i].m_plane[1], m_faces[i].m_plane[2]);
 			const btScalar d = LocalPt.dot(Normal) + m_faces[i].m_plane[3];
-			if (d > 0.0f)
+			if (d > btScalar(0.0f))
 				return false;
 		}
 	}
@@ -189,8 +189,8 @@ void btConvexPolyhedron::initialize2()
 			int k = (j + 1) % numVertices;
 			const btVector3& p1 = m_vertices[m_faces[i].m_indices[j]];
 			const btVector3& p2 = m_vertices[m_faces[i].m_indices[k]];
-			btScalar Area = ((p0 - p1).cross(p0 - p2)).length() * 0.5f;
-			btVector3 Center = (p0 + p1 + p2) / 3.0f;
+			btScalar Area = ((p0 - p1).cross(p0 - p2)).length() * btScalar(0.5f);
+			btVector3 Center = (p0 + p1 + p2) / btScalar(3);
 			m_localCenter += Area * Center;
 			TotalArea += Area;
 		}
@@ -200,7 +200,7 @@ void btConvexPolyhedron::initialize2()
 #ifdef TEST_INTERNAL_OBJECTS
 	if (1)
 	{
-		m_radius = FLT_MAX;
+		m_radius = btScalar(99999999999LL);
 		for (int i = 0; i < m_faces.size(); i++)
 		{
 			const btVector3 Normal(m_faces[i].m_plane[0], m_faces[i].m_plane[1], m_faces[i].m_plane[2]);
@@ -209,12 +209,12 @@ void btConvexPolyhedron::initialize2()
 				m_radius = dist;
 		}
 
-		btScalar MinX = FLT_MAX;
-		btScalar MinY = FLT_MAX;
-		btScalar MinZ = FLT_MAX;
-		btScalar MaxX = -FLT_MAX;
-		btScalar MaxY = -FLT_MAX;
-		btScalar MaxZ = -FLT_MAX;
+		btScalar MinX = btScalar(99999999999LL);
+		btScalar MinY = btScalar(99999999999LL);
+		btScalar MinZ = btScalar(99999999999LL);
+		btScalar MaxX = -btScalar(99999999999LL);
+		btScalar MaxY = -btScalar(99999999999LL);
+		btScalar MaxZ = -btScalar(99999999999LL);
 		for (int i = 0; i < m_vertices.size(); i++)
 		{
 			const btVector3& pt = m_vertices[i];
@@ -229,11 +229,11 @@ void btConvexPolyhedron::initialize2()
 		mE.setValue(MaxX - MinX, MaxY - MinY, MaxZ - MinZ);
 
 		//		const btScalar r = m_radius / sqrtf(2.0f);
-		const btScalar r = m_radius / sqrtf(3.0f);
+		const btScalar r = m_radius / btSqrt(btScalar(3));
 		const int LargestExtent = mE.maxAxis();
-		const btScalar Step = (mE[LargestExtent] * 0.5f - r) / 1024.0f;
+		const btScalar Step = (mE[LargestExtent] * btScalar(0.5f) - r) / btScalar(1024);
 		m_extents[0] = m_extents[1] = m_extents[2] = r;
-		m_extents[LargestExtent] = mE[LargestExtent] * 0.5f;
+		m_extents[LargestExtent] = mE[LargestExtent] * btScalar(0.5f);
 		bool FoundBox = false;
 		for (int j = 0; j < 1024; j++)
 		{
@@ -252,7 +252,7 @@ void btConvexPolyhedron::initialize2()
 		else
 		{
 			// Refine the box
-			const btScalar Step = (m_radius - r) / 1024.0f;
+			const btScalar Step = (m_radius - r) / btScalar(1024);
 			const int e0 = (1 << LargestExtent) & 3;
 			const int e1 = (1 << e0) & 3;
 

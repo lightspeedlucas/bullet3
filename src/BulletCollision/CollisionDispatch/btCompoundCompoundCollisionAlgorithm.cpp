@@ -164,7 +164,7 @@ struct btCompoundCompoundLeafCallback : btDbvt::ICollide
 			btSimplePair* pair = m_childCollisionAlgorithmCache->findPair(childIndex0, childIndex1);
 			bool removePair = false;
 			btCollisionAlgorithm* colAlgo = 0;
-			if (m_resultOut->m_closestPointDistanceThreshold > 0)
+			if (m_resultOut->m_closestPointDistanceThreshold > btScalar(0))
 			{
 				colAlgo = m_dispatcher->findAlgorithm(&compoundWrap0, &compoundWrap1, 0, BT_CLOSEST_POINT_ALGORITHMS);
 				removePair = true;

@@ -313,8 +313,8 @@ const char* btPersistentManifold::serialize(const class btPersistentManifold* ma
 
 	dataOut->m_body0 = (btCollisionObjectData*)serializer->getUniquePointer((void*)manifold->getBody0());
 	dataOut->m_body1 = (btCollisionObjectData*)serializer->getUniquePointer((void*)manifold->getBody1());
-	dataOut->m_contactBreakingThreshold = manifold->getContactBreakingThreshold();
-	dataOut->m_contactProcessingThreshold = manifold->getContactProcessingThreshold();
+	dataOut->m_contactBreakingThreshold = manifold->getContactBreakingThreshold().ToFloat();
+	dataOut->m_contactProcessingThreshold = manifold->getContactProcessingThreshold().ToFloat();
 	dataOut->m_numCachedPoints = manifold->getNumContacts();
 	dataOut->m_companionIdA = manifold->m_companionIdA;
 	dataOut->m_companionIdB = manifold->m_companionIdB;
@@ -324,20 +324,20 @@ const char* btPersistentManifold::serialize(const class btPersistentManifold* ma
 	for (int i = 0; i < this->getNumContacts(); i++)
 	{
 		const btManifoldPoint& pt = manifold->getContactPoint(i);
-		dataOut->m_pointCacheAppliedImpulse[i] = pt.m_appliedImpulse;
-		dataOut->m_pointCachePrevRHS[i] = pt.m_prevRHS;
-		dataOut->m_pointCacheAppliedImpulseLateral1[i] = pt.m_appliedImpulseLateral1;
-		dataOut->m_pointCacheAppliedImpulseLateral2[i] = pt.m_appliedImpulseLateral2;
+		dataOut->m_pointCacheAppliedImpulse[i] = pt.m_appliedImpulse.ToFloat();
+		dataOut->m_pointCachePrevRHS[i] = pt.m_prevRHS.ToFloat();
+		dataOut->m_pointCacheAppliedImpulseLateral1[i] = pt.m_appliedImpulseLateral1.ToFloat();
+		dataOut->m_pointCacheAppliedImpulseLateral2[i] = pt.m_appliedImpulseLateral2.ToFloat();
 		pt.m_localPointA.serialize(dataOut->m_pointCacheLocalPointA[i]);
 		pt.m_localPointB.serialize(dataOut->m_pointCacheLocalPointB[i]);
 		pt.m_normalWorldOnB.serialize(dataOut->m_pointCacheNormalWorldOnB[i]);
-		dataOut->m_pointCacheDistance[i] = pt.m_distance1;
-		dataOut->m_pointCacheCombinedContactDamping1[i] = pt.m_combinedContactDamping1;
-		dataOut->m_pointCacheCombinedContactStiffness1[i] = pt.m_combinedContactStiffness1;
+		dataOut->m_pointCacheDistance[i] = pt.m_distance1.ToFloat();
+		dataOut->m_pointCacheCombinedContactDamping1[i] = pt.m_combinedContactDamping1.ToFloat();
+		dataOut->m_pointCacheCombinedContactStiffness1[i] = pt.m_combinedContactStiffness1.ToFloat();
 		dataOut->m_pointCacheLifeTime[i] = pt.m_lifeTime;
-		dataOut->m_pointCacheFrictionCFM[i] = pt.m_frictionCFM;
-		dataOut->m_pointCacheContactERP[i] = pt.m_contactERP;
-		dataOut->m_pointCacheContactCFM[i] = pt.m_contactCFM;
+		dataOut->m_pointCacheFrictionCFM[i] = pt.m_frictionCFM.ToFloat();
+		dataOut->m_pointCacheContactERP[i] = pt.m_contactERP.ToFloat();
+		dataOut->m_pointCacheContactCFM[i] = pt.m_contactCFM.ToFloat();
 		dataOut->m_pointCacheContactPointFlags[i] = pt.m_contactPointFlags;
 		dataOut->m_pointCacheIndex0[i] = pt.m_index0;
 		dataOut->m_pointCacheIndex1[i] = pt.m_index1;
@@ -345,14 +345,14 @@ const char* btPersistentManifold::serialize(const class btPersistentManifold* ma
 		dataOut->m_pointCachePartId1[i] = pt.m_partId1;
 		pt.m_positionWorldOnA.serialize(dataOut->m_pointCachePositionWorldOnA[i]);
 		pt.m_positionWorldOnB.serialize(dataOut->m_pointCachePositionWorldOnB[i]);
-		dataOut->m_pointCacheCombinedFriction[i] = pt.m_combinedFriction;
+		dataOut->m_pointCacheCombinedFriction[i] = pt.m_combinedFriction.ToFloat();
 		pt.m_lateralFrictionDir1.serialize(dataOut->m_pointCacheLateralFrictionDir1[i]);
 		pt.m_lateralFrictionDir2.serialize(dataOut->m_pointCacheLateralFrictionDir2[i]);
-		dataOut->m_pointCacheCombinedRollingFriction[i] = pt.m_combinedRollingFriction;
-		dataOut->m_pointCacheCombinedSpinningFriction[i] = pt.m_combinedSpinningFriction;
-		dataOut->m_pointCacheCombinedRestitution[i] = pt.m_combinedRestitution;
-		dataOut->m_pointCacheContactMotion1[i] = pt.m_contactMotion1;
-		dataOut->m_pointCacheContactMotion2[i] = pt.m_contactMotion2;
+		dataOut->m_pointCacheCombinedRollingFriction[i] = pt.m_combinedRollingFriction.ToFloat();
+		dataOut->m_pointCacheCombinedSpinningFriction[i] = pt.m_combinedSpinningFriction.ToFloat();
+		dataOut->m_pointCacheCombinedRestitution[i] = pt.m_combinedRestitution.ToFloat();
+		dataOut->m_pointCacheContactMotion1[i] = pt.m_contactMotion1.ToFloat();
+		dataOut->m_pointCacheContactMotion2[i] = pt.m_contactMotion2.ToFloat();
 	}
 	return btPersistentManifoldDataName;
 }

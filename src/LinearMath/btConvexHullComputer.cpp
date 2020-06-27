@@ -322,7 +322,7 @@ public:
 
 		btScalar toScalar() const
 		{
-			return sign * ((m_denominator == 0) ? SIMD_INFINITY : (btScalar)m_numerator / m_denominator);
+			return btScalar(sign) * ((m_denominator == 0) ? btScalar(SIMD_INFINITY) : btScalar(m_numerator) / btScalar(m_denominator));
 		}
 	};
 
@@ -386,7 +386,7 @@ public:
 
 		btScalar toScalar() const
 		{
-			return sign * ((denominator.getSign() == 0) ? SIMD_INFINITY : numerator.toScalar() / denominator.toScalar());
+			return btScalar(sign) * ((denominator.getSign() == 0) ? btScalar(SIMD_INFINITY) : numerator.toScalar() / denominator.toScalar());
 		}
 	};
 
@@ -2022,9 +2022,9 @@ void btConvexHullInternal::compute(const void* coords, bool doubleCoords, int st
 			btVector3 p((btScalar)v[0], (btScalar)v[1], (btScalar)v[2]);
 			ptr += stride;
 			p = (p - center) * s;
-			points[i].x = (int32_t)p[medAxis];
-			points[i].y = (int32_t)p[maxAxis];
-			points[i].z = (int32_t)p[minAxis];
+			points[i].x = (int32_t)p[medAxis].ToInt();
+			points[i].y = (int32_t)p[maxAxis].ToInt();
+			points[i].z = (int32_t)p[minAxis].ToInt();
 			points[i].index = i;
 		}
 	}
@@ -2036,9 +2036,9 @@ void btConvexHullInternal::compute(const void* coords, bool doubleCoords, int st
 			btVector3 p(v[0], v[1], v[2]);
 			ptr += stride;
 			p = (p - center) * s;
-			points[i].x = (int32_t)p[medAxis];
-			points[i].y = (int32_t)p[maxAxis];
-			points[i].z = (int32_t)p[minAxis];
+			points[i].x = (int32_t)p[medAxis].ToInt();
+			points[i].y = (int32_t)p[maxAxis].ToInt();
+			points[i].z = (int32_t)p[minAxis].ToInt();
 			points[i].index = i;
 		}
 	}
@@ -2175,7 +2175,7 @@ btScalar btConvexHullInternal::shrink(btScalar amount, btScalar clampAmount)
 	hullCenter[medAxis] = hullCenterX.toScalar();
 	hullCenter[maxAxis] = hullCenterY.toScalar();
 	hullCenter[minAxis] = hullCenterZ.toScalar();
-	hullCenter /= 4 * volume.toScalar();
+	hullCenter /= btScalar(4) * volume.toScalar();
 	hullCenter *= scaling;
 
 	int faceCount = faces.size();
@@ -2233,7 +2233,7 @@ bool btConvexHullInternal::shiftFace(Face* face, btScalar amount, btAlignedObjec
 	{
 		origShift[2] /= scaling[2];
 	}
-	Point32 shift((int32_t)origShift[medAxis], (int32_t)origShift[maxAxis], (int32_t)origShift[minAxis]);
+	Point32 shift((int32_t)origShift[medAxis].ToInt(), (int32_t)origShift[maxAxis].ToInt(), (int32_t)origShift[minAxis].ToInt());
 	if (shift.isZero())
 	{
 		return true;
@@ -2494,9 +2494,9 @@ bool btConvexHullInternal::shiftFace(Face* face, btScalar amount, btAlignedObjec
 									Int128::mul(face->dir0.y * r0, m11) - Int128::mul(face->dir0.y * r1, m01) + Int128::mul(face->dir1.y * r1, m00) - Int128::mul(face->dir1.y * r0, m10) + det * shiftedOrigin.y,
 									Int128::mul(face->dir0.z * r0, m11) - Int128::mul(face->dir0.z * r1, m01) + Int128::mul(face->dir1.z * r1, m00) - Int128::mul(face->dir1.z * r0, m10) + det * shiftedOrigin.z,
 									det);
-			v->point.x = (int32_t)v->point128.xvalue();
-			v->point.y = (int32_t)v->point128.yvalue();
-			v->point.z = (int32_t)v->point128.zvalue();
+			v->point.x = (int32_t)v->point128.xvalue().ToInt();
+			v->point.y = (int32_t)v->point128.yvalue().ToInt();
+			v->point.z = (int32_t)v->point128.zvalue().ToInt();
 			intersection->target = v;
 			v->edges = e;
 

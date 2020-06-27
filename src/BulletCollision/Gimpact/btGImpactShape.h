@@ -637,16 +637,16 @@ public:
 			if (type == PHY_DOUBLE)
 			{
 				double* dvertices = (double*)(vertexbase + vertex_index * stride);
-				vertex[0] = btScalar(dvertices[0] * m_scale[0]);
-				vertex[1] = btScalar(dvertices[1] * m_scale[1]);
-				vertex[2] = btScalar(dvertices[2] * m_scale[2]);
+				vertex[0] = btScalar(btScalar(dvertices[0]) * m_scale[0]);
+				vertex[1] = btScalar(btScalar(dvertices[1]) * m_scale[1]);
+				vertex[2] = btScalar(btScalar(dvertices[2]) * m_scale[2]);
 			}
 			else
 			{
 				float* svertices = (float*)(vertexbase + vertex_index * stride);
-				vertex[0] = svertices[0] * m_scale[0];
-				vertex[1] = svertices[1] * m_scale[1];
-				vertex[2] = svertices[2] * m_scale[2];
+				vertex[0] = btScalar(svertices[0]) * m_scale[0];
+				vertex[1] = btScalar(svertices[1]) * m_scale[1];
+				vertex[2] = btScalar(svertices[2]) * m_scale[2];
 			}
 		}
 

@@ -198,18 +198,18 @@ inline int ccdEq(btScalar _a, btScalar _b)
 	btScalar a, b;
 
 	ab = btFabs(_a - _b);
-	if (btFabs(ab) < SIMD_EPSILON)
+	if (btFabs(ab) < btScalar(SIMD_EPSILON))
 		return 1;
 
 	a = btFabs(_a);
 	b = btFabs(_b);
 	if (b > a)
 	{
-		return ab < SIMD_EPSILON * b;
+		return ab < btScalar(SIMD_EPSILON) * b;
 	}
 	else
 	{
-		return ab < SIMD_EPSILON * a;
+		return ab < btScalar(SIMD_EPSILON) * a;
 	}
 }
 
@@ -347,8 +347,8 @@ btScalar btVec3PointTriDist2(const btVector3 *P,
 	// computed.
 
 	btVector3 d1, d2, a;
-	double u, v, w, p, q, r;
-	double s, t, dist, dist2;
+	btScalar u, v, w, p, q, r;
+	btScalar s, t, dist, dist2;
 	btVector3 witness2;
 
 	btVec3Sub2(&d1, B, x0);
@@ -806,7 +806,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput &inpu
 					status = -1;
 				}
 
-				if (dir.length2() < SIMD_EPSILON)
+				if (dir.length2() < btScalar(SIMD_EPSILON))
 				{
 					//no intersection, besides margin
 					status = -1;
@@ -927,7 +927,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput &inpu
 				//redundant m_simplexSolver->compute_points(pointOnA, pointOnB);
 
 				//are we getting any closer ?
-				if (previousSquaredDistance - squaredDistance <= SIMD_EPSILON * previousSquaredDistance)
+				if (previousSquaredDistance - squaredDistance <= btScalar(SIMD_EPSILON) * previousSquaredDistance)
 				{
 					//				m_simplexSolver->backup_closest(m_cachedSeparatingAxis);
 					checkSimplex = true;
@@ -980,7 +980,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput &inpu
 				{
 					m_degenerateSimplex = 5;
 				}
-				if (lenSqr > SIMD_EPSILON * SIMD_EPSILON)
+				if (lenSqr > btScalar(SIMD_EPSILON) * btScalar(SIMD_EPSILON))
 				{
 					btScalar rlen = btScalar(1.) / btSqrt(lenSqr);
 					normalInB *= rlen;  //normalize
@@ -1026,19 +1026,19 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput &inpu
 					m_cachedSeparatingAxis, tmpPointOnA, tmpPointOnB,
 					debugDraw);
 
-				if (m_cachedSeparatingAxis.length2())
+				if (m_cachedSeparatingAxis.length2() != btScalar(0))
 				{
 					if (isValid2)
 					{
 						btVector3 tmpNormalInB = tmpPointOnB - tmpPointOnA;
 						btScalar lenSqr = tmpNormalInB.length2();
-						if (lenSqr <= (SIMD_EPSILON * SIMD_EPSILON))
+						if (lenSqr <= btScalar(SIMD_EPSILON) * btScalar(SIMD_EPSILON))
 						{
 							tmpNormalInB = m_cachedSeparatingAxis;
 							lenSqr = m_cachedSeparatingAxis.length2();
 						}
 
-						if (lenSqr > (SIMD_EPSILON * SIMD_EPSILON))
+						if (lenSqr > btScalar(SIMD_EPSILON) * btScalar(SIMD_EPSILON))
 						{
 							tmpNormalInB /= btSqrt(lenSqr);
 							btScalar distance2 = -(tmpPointOnA - tmpPointOnB).length();
@@ -1161,7 +1161,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput &inpu
 				normalInB *= -1;
 			}
 
-			if (orgNormalInB.length2())
+			if (orgNormalInB.length2() != btScalar(0))
 			{
 				if (d2 > d0 && d2 > d1 && d2 > distance)
 				{

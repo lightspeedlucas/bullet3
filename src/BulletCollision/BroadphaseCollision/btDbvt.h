@@ -521,15 +521,15 @@ DBVT_INLINE void btDbvtAabbMm::Expand(const btVector3& e)
 //
 DBVT_INLINE void btDbvtAabbMm::SignedExpand(const btVector3& e)
 {
-	if (e.x() > 0)
+	if (e.x() > btScalar(0))
 		mx.setX(mx.x() + e[0]);
 	else
 		mi.setX(mi.x() + e[0]);
-	if (e.y() > 0)
+	if (e.y() > btScalar(0))
 		mx.setY(mx.y() + e[1]);
 	else
 		mi.setY(mi.y() + e[1]);
-	if (e.z() > 0)
+	if (e.z() > btScalar(0))
 		mx.setZ(mx.z() + e[2]);
 	else
 		mi.setZ(mi.z() + e[2]);
@@ -585,8 +585,8 @@ DBVT_INLINE int btDbvtAabbMm::Classify(const btVector3& n, btScalar o, int s) co
 			pi = btVector3(mi.x(), mi.y(), mi.z());
 			break;
 	}
-	if ((btDot(n, px) + o) < 0) return (-1);
-	if ((btDot(n, pi) + o) >= 0) return (+1);
+	if ((btDot(n, px) + o) < btScalar(0)) return (-1);
+	if ((btDot(n, pi) + o) >= btScalar(0)) return (+1);
 	return (0);
 }
 
@@ -605,7 +605,7 @@ DBVT_INLINE void btDbvtAabbMm::AddSpan(const btVector3& d, btScalar& smi, btScal
 {
 	for (int i = 0; i < 3; ++i)
 	{
-		if (d[i] < 0)
+		if (d[i] < btScalar(0))
 		{
 			smi += mx[i] * d[i];
 			smx += mi[i] * d[i];
@@ -622,23 +622,12 @@ DBVT_INLINE void btDbvtAabbMm::AddSpan(const btVector3& d, btScalar& smi, btScal
 DBVT_INLINE bool Intersect(const btDbvtAabbMm& a,
 						   const btDbvtAabbMm& b)
 {
-#if DBVT_INT0_IMPL == DBVT_IMPL_SSE
-	const __m128 rt(_mm_or_ps(_mm_cmplt_ps(_mm_load_ps(b.mx), _mm_load_ps(a.mi)),
-							  _mm_cmplt_ps(_mm_load_ps(a.mx), _mm_load_ps(b.mi))));
-#if defined(_WIN32)
-	const __int32* pu((const __int32*)&rt);
-#else
-	const int* pu((const int*)&rt);
-#endif
-	return ((pu[0] | pu[1] | pu[2]) == 0);
-#else
 	return ((a.mi.x() <= b.mx.x()) &&
 			(a.mx.x() >= b.mi.x()) &&
 			(a.mi.y() <= b.mx.y()) &&
 			(a.mx.y() >= b.mi.y()) &&
 			(a.mi.z() <= b.mx.z()) &&
 			(a.mx.z() >= b.mi.z()));
-#endif
 }
 
 //
@@ -668,78 +657,7 @@ DBVT_INLINE int Select(const btDbvtAabbMm& o,
 					   const btDbvtAabbMm& a,
 					   const btDbvtAabbMm& b)
 {
-#if DBVT_SELECT_IMPL == DBVT_IMPL_SSE
-
-#if defined(_WIN32)
-	static ATTRIBUTE_ALIGNED16(const unsigned __int32) mask[] = {0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff};
-#else
-	static ATTRIBUTE_ALIGNED16(const unsigned int) mask[] = {0x7fffffff, 0x7fffffff, 0x7fffffff, 0x00000000 /*0x7fffffff*/};
-#endif
-	///@todo: the intrinsic version is 11% slower
-#if DBVT_USE_INTRINSIC_SSE
-
-	union btSSEUnion  ///NOTE: if we use more intrinsics, move btSSEUnion into the LinearMath directory
-	{
-		__m128 ssereg;
-		float floats[4];
-		int ints[4];
-	};
-
-	__m128 omi(_mm_load_ps(o.mi));
-	omi = _mm_add_ps(omi, _mm_load_ps(o.mx));
-	__m128 ami(_mm_load_ps(a.mi));
-	ami = _mm_add_ps(ami, _mm_load_ps(a.mx));
-	ami = _mm_sub_ps(ami, omi);
-	ami = _mm_and_ps(ami, _mm_load_ps((const float*)mask));
-	__m128 bmi(_mm_load_ps(b.mi));
-	bmi = _mm_add_ps(bmi, _mm_load_ps(b.mx));
-	bmi = _mm_sub_ps(bmi, omi);
-	bmi = _mm_and_ps(bmi, _mm_load_ps((const float*)mask));
-	__m128 t0(_mm_movehl_ps(ami, ami));
-	ami = _mm_add_ps(ami, t0);
-	ami = _mm_add_ss(ami, _mm_shuffle_ps(ami, ami, 1));
-	__m128 t1(_mm_movehl_ps(bmi, bmi));
-	bmi = _mm_add_ps(bmi, t1);
-	bmi = _mm_add_ss(bmi, _mm_shuffle_ps(bmi, bmi, 1));
-
-	btSSEUnion tmp;
-	tmp.ssereg = _mm_cmple_ss(bmi, ami);
-	return tmp.ints[0] & 1;
-
-#else
-	ATTRIBUTE_ALIGNED16(__int32 r[1]);
-	__asm
-	{
-		mov		eax,o
-			mov		ecx,a
-			mov		edx,b
-			movaps	xmm0,[eax]
-		movaps	xmm5,mask
-			addps	xmm0,[eax+16]	
-		movaps	xmm1,[ecx]
-		movaps	xmm2,[edx]
-		addps	xmm1,[ecx+16]
-		addps	xmm2,[edx+16]
-		subps	xmm1,xmm0
-			subps	xmm2,xmm0
-			andps	xmm1,xmm5
-			andps	xmm2,xmm5
-			movhlps	xmm3,xmm1
-			movhlps	xmm4,xmm2
-			addps	xmm1,xmm3
-			addps	xmm2,xmm4
-			pshufd	xmm3,xmm1,1
-			pshufd	xmm4,xmm2,1
-			addss	xmm1,xmm3
-			addss	xmm2,xmm4
-			cmpless	xmm2,xmm1
-			movss	r,xmm2
-	}
-	return (r[0] & 1);
-#endif
-#else
 	return (Proximity(o, a) < Proximity(o, b) ? 0 : 1);
-#endif
 }
 
 //
@@ -747,16 +665,6 @@ DBVT_INLINE void Merge(const btDbvtAabbMm& a,
 					   const btDbvtAabbMm& b,
 					   btDbvtAabbMm& r)
 {
-#if DBVT_MERGE_IMPL == DBVT_IMPL_SSE
-	__m128 ami(_mm_load_ps(a.mi));
-	__m128 amx(_mm_load_ps(a.mx));
-	__m128 bmi(_mm_load_ps(b.mi));
-	__m128 bmx(_mm_load_ps(b.mx));
-	ami = _mm_min_ps(ami, bmi);
-	amx = _mm_max_ps(amx, bmx);
-	_mm_store_ps(r.mi, ami);
-	_mm_store_ps(r.mx, amx);
-#else
 	for (int i = 0; i < 3; ++i)
 	{
 		if (a.mi[i] < b.mi[i])
@@ -768,7 +676,6 @@ DBVT_INLINE void Merge(const btDbvtAabbMm& a,
 		else
 			r.mx[i] = b.mx[i];
 	}
-#endif
 }
 
 //
@@ -1287,10 +1194,10 @@ inline void btDbvt::rayTest(const btDbvtNode* root,
 
 		///what about division by zero? --> just set rayDirection[i] to INF/BT_LARGE_FLOAT
 		btVector3 rayDirectionInverse;
-		rayDirectionInverse[0] = rayDir[0] == btScalar(0.0) ? btScalar(BT_LARGE_FLOAT) : btScalar(1.0) / rayDir[0];
-		rayDirectionInverse[1] = rayDir[1] == btScalar(0.0) ? btScalar(BT_LARGE_FLOAT) : btScalar(1.0) / rayDir[1];
-		rayDirectionInverse[2] = rayDir[2] == btScalar(0.0) ? btScalar(BT_LARGE_FLOAT) : btScalar(1.0) / rayDir[2];
-		unsigned int signs[3] = {rayDirectionInverse[0] < 0.0, rayDirectionInverse[1] < 0.0, rayDirectionInverse[2] < 0.0};
+		rayDirectionInverse[0] = rayDir[0] == btScalar(0) ? btScalar(BT_LARGE_FLOAT) : btScalar(1) / rayDir[0];
+		rayDirectionInverse[1] = rayDir[1] == btScalar(0) ? btScalar(BT_LARGE_FLOAT) : btScalar(1) / rayDir[1];
+		rayDirectionInverse[2] = rayDir[2] == btScalar(0) ? btScalar(BT_LARGE_FLOAT) : btScalar(1) / rayDir[2];
+		unsigned int signs[3] = {rayDirectionInverse[0] < btScalar(0), rayDirectionInverse[1] < btScalar(0), rayDirectionInverse[2] < btScalar(0)};
 
 		btScalar lambda_max = rayDir.dot(rayTo - rayFrom);
 

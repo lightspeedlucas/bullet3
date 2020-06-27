@@ -216,58 +216,6 @@ public:
 		btFullAssert(d != btScalar(0.0));
 		btScalar s = btScalar(2.0) / d;
 
-#if defined BT_USE_SIMD_VECTOR3 && defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)
-		__m128 vs, Q = q.get128();
-		__m128i Qi = btCastfTo128i(Q);
-		__m128 Y, Z;
-		__m128 V1, V2, V3;
-		__m128 V11, V21, V31;
-		__m128 NQ = _mm_xor_ps(Q, btvMzeroMask);
-		__m128i NQi = btCastfTo128i(NQ);
-
-		V1 = btCastiTo128f(_mm_shuffle_epi32(Qi, BT_SHUFFLE(1, 0, 2, 3)));  // Y X Z W
-		V2 = _mm_shuffle_ps(NQ, Q, BT_SHUFFLE(0, 0, 1, 3));                 // -X -X  Y  W
-		V3 = btCastiTo128f(_mm_shuffle_epi32(Qi, BT_SHUFFLE(2, 1, 0, 3)));  // Z Y X W
-		V1 = _mm_xor_ps(V1, vMPPP);                                         //	change the sign of the first element
-
-		V11 = btCastiTo128f(_mm_shuffle_epi32(Qi, BT_SHUFFLE(1, 1, 0, 3)));  // Y Y X W
-		V21 = _mm_unpackhi_ps(Q, Q);                                         //  Z  Z  W  W
-		V31 = _mm_shuffle_ps(Q, NQ, BT_SHUFFLE(0, 2, 0, 3));                 //  X  Z -X -W
-
-		V2 = V2 * V1;   //
-		V1 = V1 * V11;  //
-		V3 = V3 * V31;  //
-
-		V11 = _mm_shuffle_ps(NQ, Q, BT_SHUFFLE(2, 3, 1, 3));                //	-Z -W  Y  W
-		V11 = V11 * V21;                                                    //
-		V21 = _mm_xor_ps(V21, vMPPP);                                       //	change the sign of the first element
-		V31 = _mm_shuffle_ps(Q, NQ, BT_SHUFFLE(3, 3, 1, 3));                //	 W  W -Y -W
-		V31 = _mm_xor_ps(V31, vMPPP);                                       //	change the sign of the first element
-		Y = btCastiTo128f(_mm_shuffle_epi32(NQi, BT_SHUFFLE(3, 2, 0, 3)));  // -W -Z -X -W
-		Z = btCastiTo128f(_mm_shuffle_epi32(Qi, BT_SHUFFLE(1, 0, 1, 3)));   //  Y  X  Y  W
-
-		vs = _mm_load_ss(&s);
-		V21 = V21 * Y;
-		V31 = V31 * Z;
-
-		V1 = V1 + V11;
-		V2 = V2 + V21;
-		V3 = V3 + V31;
-
-		vs = bt_splat3_ps(vs, 0);
-		//	s ready
-		V1 = V1 * vs;
-		V2 = V2 * vs;
-		V3 = V3 * vs;
-
-		V1 = V1 + v1000;
-		V2 = V2 + v0100;
-		V3 = V3 + v0010;
-
-		m_el[0] = V1;
-		m_el[1] = V2;
-		m_el[2] = V3;
-#else
 		btScalar xs = q.x() * s, ys = q.y() * s, zs = q.z() * s;
 		btScalar wx = q.w() * xs, wy = q.w() * ys, wz = q.w() * zs;
 		btScalar xx = q.x() * xs, xy = q.x() * ys, xz = q.x() * zs;
@@ -276,7 +224,6 @@ public:
 			btScalar(1.0) - (yy + zz), xy - wz, xz + wy,
 			xy + wz, btScalar(1.0) - (xx + zz), yz - wx,
 			xz - wy, yz + wx, btScalar(1.0) - (xx + yy));
-#endif
 	}
 
 	/** @brief Set the matrix from euler angles using YPR around YXZ respectively
@@ -320,29 +267,18 @@ public:
 	/**@brief Set the matrix to the identity */
 	void setIdentity()
 	{
-#if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
-		m_el[0] = v1000;
-		m_el[1] = v0100;
-		m_el[2] = v0010;
-#else
-		setValue(btScalar(1.0), btScalar(0.0), btScalar(0.0),
-				 btScalar(0.0), btScalar(1.0), btScalar(0.0),
-				 btScalar(0.0), btScalar(0.0), btScalar(1.0));
-#endif
+		setValue(btScalar(1), btScalar(0), btScalar(0),
+				 btScalar(0), btScalar(1), btScalar(0),
+				 btScalar(0), btScalar(0), btScalar(1));
 	}
 
 	static const btMatrix3x3& getIdentity()
 	{
-#if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
-		static const btMatrix3x3
-			identityMatrix(v1000, v0100, v0010);
-#else
 		static const btMatrix3x3
 			identityMatrix(
-				btScalar(1.0), btScalar(0.0), btScalar(0.0),
-				btScalar(0.0), btScalar(1.0), btScalar(0.0),
-				btScalar(0.0), btScalar(0.0), btScalar(1.0));
-#endif
+				btScalar(1), btScalar(0), btScalar(0),
+				btScalar(0), btScalar(1), btScalar(0),
+				btScalar(0), btScalar(0), btScalar(1));
 		return identityMatrix;
 	}
 
@@ -403,74 +339,6 @@ public:
 	* @param q The quaternion which will be set */
 	void getRotation(btQuaternion & q) const
 	{
-#if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE)) || defined(BT_USE_NEON)
-		btScalar trace = m_el[0].x() + m_el[1].y() + m_el[2].z();
-		btScalar s, x;
-
-		union {
-			btSimdFloat4 vec;
-			btScalar f[4];
-		} temp;
-
-		if (trace > btScalar(0.0))
-		{
-			x = trace + btScalar(1.0);
-
-			temp.f[0] = m_el[2].y() - m_el[1].z();
-			temp.f[1] = m_el[0].z() - m_el[2].x();
-			temp.f[2] = m_el[1].x() - m_el[0].y();
-			temp.f[3] = x;
-			//temp.f[3]= s * btScalar(0.5);
-		}
-		else
-		{
-			int i, j, k;
-			if (m_el[0].x() < m_el[1].y())
-			{
-				if (m_el[1].y() < m_el[2].z())
-				{
-					i = 2;
-					j = 0;
-					k = 1;
-				}
-				else
-				{
-					i = 1;
-					j = 2;
-					k = 0;
-				}
-			}
-			else
-			{
-				if (m_el[0].x() < m_el[2].z())
-				{
-					i = 2;
-					j = 0;
-					k = 1;
-				}
-				else
-				{
-					i = 0;
-					j = 1;
-					k = 2;
-				}
-			}
-
-			x = m_el[i][i] - m_el[j][j] - m_el[k][k] + btScalar(1.0);
-
-			temp.f[3] = (m_el[k][j] - m_el[j][k]);
-			temp.f[j] = (m_el[j][i] + m_el[i][j]);
-			temp.f[k] = (m_el[k][i] + m_el[i][k]);
-			temp.f[i] = x;
-			//temp.f[i] = s * btScalar(0.5);
-		}
-
-		s = btSqrt(x);
-		q.set128(temp.vec);
-		s = btScalar(0.5) / s;
-
-		q *= s;
-#else
 		btScalar trace = m_el[0].x() + m_el[1].y() + m_el[2].z();
 
 		btScalar temp[4];
@@ -500,7 +368,6 @@ public:
 			temp[k] = (m_el[k][i] + m_el[i][k]) * s;
 		}
 		q.setValue(temp[0], temp[1], temp[2], temp[3]);
-#endif
 	}
 
 	/**@brief Get the matrix represented as euler angles around YXZ, roundtrip with setEulerYPR
@@ -517,12 +384,12 @@ public:
 		// on pitch = +/-HalfPI
 		if (btFabs(pitch) == SIMD_HALF_PI)
 		{
-			if (yaw > 0)
+			if (yaw > btScalar(0))
 				yaw -= SIMD_PI;
 			else
 				yaw += SIMD_PI;
 
-			if (roll > 0)
+			if (roll > btScalar(0))
 				roll -= SIMD_PI;
 			else
 				roll += SIMD_PI;
@@ -548,14 +415,14 @@ public:
 		//get the pointer to the raw data
 
 		// Check that pitch is not at a singularity
-		if (btFabs(m_el[2].x()) >= 1)
+		if (btFabs(m_el[2].x()) >= btScalar(1))
 		{
 			euler_out.yaw = 0;
 			euler_out2.yaw = 0;
 
 			// From difference of angles formula
 			btScalar delta = btAtan2(m_el[0].x(), m_el[0].z());
-			if (m_el[2].x() > 0)  //gimbal locked up
+			if (m_el[2].x() > btScalar(0))  //gimbal locked up
 			{
 				euler_out.pitch = SIMD_PI / btScalar(2.0);
 				euler_out2.pitch = SIMD_PI / btScalar(2.0);
@@ -636,9 +503,9 @@ public:
 		btVector3 col3 = getColumn(2);
 
 		btScalar det = btDot(col1, btCross(col2, col3));
-		if (btFabs(det) > SIMD_EPSILON)
+		if (btFabs(det) > btScalar(SIMD_EPSILON))
 		{
-			det = 1.0f / det;
+			det = btScalar(1.0f) / det;
 		}
 		btVector3 x;
 		x[0] = det * btDot(b, btCross(col2, col3));
@@ -726,7 +593,7 @@ public:
 			btScalar t = threshold * (btFabs(m_el[0][0]) + btFabs(m_el[1][1]) + btFabs(m_el[2][2]));
 			if (max <= t)
 			{
-				if (max <= SIMD_EPSILON * t)
+				if (max <= btScalar(SIMD_EPSILON) * t)
 				{
 					return;
 				}
@@ -735,22 +602,22 @@ public:
 
 			// compute Jacobi rotation J which leads to a zero for element [p][q]
 			btScalar mpq = m_el[p][q];
-			btScalar theta = (m_el[q][q] - m_el[p][p]) / (2 * mpq);
+			btScalar theta = (m_el[q][q] - m_el[p][p]) / (btScalar(2) * mpq);
 			btScalar theta2 = theta * theta;
 			btScalar cos;
 			btScalar sin;
 			if (theta2 * theta2 < btScalar(10 / SIMD_EPSILON))
 			{
-				t = (theta >= 0) ? 1 / (theta + btSqrt(1 + theta2))
-								 : 1 / (theta - btSqrt(1 + theta2));
-				cos = 1 / btSqrt(1 + t * t);
+				t = (theta >= btScalar(0)) ? btScalar(1) / (theta + btSqrt(btScalar(1) + theta2))
+								 : btScalar(1) / (theta - btSqrt(btScalar(1) + theta2));
+				cos = btScalar(1) / btSqrt(btScalar(1) + t * t);
 				sin = cos * t;
 			}
 			else
 			{
 				// approximation for large theta-value, i.e., a nearly diagonal matrix
-				t = 1 / (theta * (2 + btScalar(0.5) / theta2));
-				cos = 1 - btScalar(0.5) * t * t;
+				t = btScalar(1) / (theta * (btScalar(2) + btScalar(0.5) / theta2));
+				cos = btScalar(1) - btScalar(0.5) * t * t;
 				sin = cos * t;
 			}
 
@@ -1208,126 +1075,16 @@ operator*(const btMatrix3x3& m, const btVector3& v)
 SIMD_FORCE_INLINE btVector3
 operator*(const btVector3& v, const btMatrix3x3& m)
 {
-#if defined BT_USE_SIMD_VECTOR3 && (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE))
-
-	const __m128 vv = v.mVec128;
-
-	__m128 c0 = bt_splat_ps(vv, 0);
-	__m128 c1 = bt_splat_ps(vv, 1);
-	__m128 c2 = bt_splat_ps(vv, 2);
-
-	c0 = _mm_mul_ps(c0, _mm_and_ps(m[0].mVec128, btvFFF0fMask));
-	c1 = _mm_mul_ps(c1, _mm_and_ps(m[1].mVec128, btvFFF0fMask));
-	c0 = _mm_add_ps(c0, c1);
-	c2 = _mm_mul_ps(c2, _mm_and_ps(m[2].mVec128, btvFFF0fMask));
-
-	return btVector3(_mm_add_ps(c0, c2));
-#elif defined(BT_USE_NEON)
-	const float32x4_t vv = v.mVec128;
-	const float32x2_t vlo = vget_low_f32(vv);
-	const float32x2_t vhi = vget_high_f32(vv);
-
-	float32x4_t c0, c1, c2;
-
-	c0 = (float32x4_t)vandq_s32((int32x4_t)m[0].mVec128, btvFFF0Mask);
-	c1 = (float32x4_t)vandq_s32((int32x4_t)m[1].mVec128, btvFFF0Mask);
-	c2 = (float32x4_t)vandq_s32((int32x4_t)m[2].mVec128, btvFFF0Mask);
-
-	c0 = vmulq_lane_f32(c0, vlo, 0);
-	c1 = vmulq_lane_f32(c1, vlo, 1);
-	c2 = vmulq_lane_f32(c2, vhi, 0);
-	c0 = vaddq_f32(c0, c1);
-	c0 = vaddq_f32(c0, c2);
-
-	return btVector3(c0);
-#else
 	return btVector3(m.tdotx(v), m.tdoty(v), m.tdotz(v));
-#endif
 }
 
 SIMD_FORCE_INLINE btMatrix3x3
 operator*(const btMatrix3x3& m1, const btMatrix3x3& m2)
 {
-#if defined BT_USE_SIMD_VECTOR3 && (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE))
-
-	__m128 m10 = m1[0].mVec128;
-	__m128 m11 = m1[1].mVec128;
-	__m128 m12 = m1[2].mVec128;
-
-	__m128 m2v = _mm_and_ps(m2[0].mVec128, btvFFF0fMask);
-
-	__m128 c0 = bt_splat_ps(m10, 0);
-	__m128 c1 = bt_splat_ps(m11, 0);
-	__m128 c2 = bt_splat_ps(m12, 0);
-
-	c0 = _mm_mul_ps(c0, m2v);
-	c1 = _mm_mul_ps(c1, m2v);
-	c2 = _mm_mul_ps(c2, m2v);
-
-	m2v = _mm_and_ps(m2[1].mVec128, btvFFF0fMask);
-
-	__m128 c0_1 = bt_splat_ps(m10, 1);
-	__m128 c1_1 = bt_splat_ps(m11, 1);
-	__m128 c2_1 = bt_splat_ps(m12, 1);
-
-	c0_1 = _mm_mul_ps(c0_1, m2v);
-	c1_1 = _mm_mul_ps(c1_1, m2v);
-	c2_1 = _mm_mul_ps(c2_1, m2v);
-
-	m2v = _mm_and_ps(m2[2].mVec128, btvFFF0fMask);
-
-	c0 = _mm_add_ps(c0, c0_1);
-	c1 = _mm_add_ps(c1, c1_1);
-	c2 = _mm_add_ps(c2, c2_1);
-
-	m10 = bt_splat_ps(m10, 2);
-	m11 = bt_splat_ps(m11, 2);
-	m12 = bt_splat_ps(m12, 2);
-
-	m10 = _mm_mul_ps(m10, m2v);
-	m11 = _mm_mul_ps(m11, m2v);
-	m12 = _mm_mul_ps(m12, m2v);
-
-	c0 = _mm_add_ps(c0, m10);
-	c1 = _mm_add_ps(c1, m11);
-	c2 = _mm_add_ps(c2, m12);
-
-	return btMatrix3x3(c0, c1, c2);
-
-#elif defined(BT_USE_NEON)
-
-	float32x4_t rv0, rv1, rv2;
-	float32x4_t v0, v1, v2;
-	float32x4_t mv0, mv1, mv2;
-
-	v0 = m1[0].mVec128;
-	v1 = m1[1].mVec128;
-	v2 = m1[2].mVec128;
-
-	mv0 = (float32x4_t)vandq_s32((int32x4_t)m2[0].mVec128, btvFFF0Mask);
-	mv1 = (float32x4_t)vandq_s32((int32x4_t)m2[1].mVec128, btvFFF0Mask);
-	mv2 = (float32x4_t)vandq_s32((int32x4_t)m2[2].mVec128, btvFFF0Mask);
-
-	rv0 = vmulq_lane_f32(mv0, vget_low_f32(v0), 0);
-	rv1 = vmulq_lane_f32(mv0, vget_low_f32(v1), 0);
-	rv2 = vmulq_lane_f32(mv0, vget_low_f32(v2), 0);
-
-	rv0 = vmlaq_lane_f32(rv0, mv1, vget_low_f32(v0), 1);
-	rv1 = vmlaq_lane_f32(rv1, mv1, vget_low_f32(v1), 1);
-	rv2 = vmlaq_lane_f32(rv2, mv1, vget_low_f32(v2), 1);
-
-	rv0 = vmlaq_lane_f32(rv0, mv2, vget_high_f32(v0), 0);
-	rv1 = vmlaq_lane_f32(rv1, mv2, vget_high_f32(v1), 0);
-	rv2 = vmlaq_lane_f32(rv2, mv2, vget_high_f32(v2), 0);
-
-	return btMatrix3x3(rv0, rv1, rv2);
-
-#else
 	return btMatrix3x3(
 		m2.tdotx(m1[0]), m2.tdoty(m1[0]), m2.tdotz(m1[0]),
 		m2.tdotx(m1[1]), m2.tdoty(m1[1]), m2.tdotz(m1[1]),
 		m2.tdotx(m1[2]), m2.tdoty(m1[2]), m2.tdotz(m1[2]));
-#endif
 }
 
 /*
@@ -1349,25 +1106,9 @@ m1[0][2] * m2[0][2] + m1[1][2] * m2[1][2] + m1[2][2] * m2[2][2]);
 * It will test all elements are equal.  */
 SIMD_FORCE_INLINE bool operator==(const btMatrix3x3& m1, const btMatrix3x3& m2)
 {
-#if (defined(BT_USE_SSE_IN_API) && defined(BT_USE_SSE))
-
-	__m128 c0, c1, c2;
-
-	c0 = _mm_cmpeq_ps(m1[0].mVec128, m2[0].mVec128);
-	c1 = _mm_cmpeq_ps(m1[1].mVec128, m2[1].mVec128);
-	c2 = _mm_cmpeq_ps(m1[2].mVec128, m2[2].mVec128);
-
-	c0 = _mm_and_ps(c0, c1);
-	c0 = _mm_and_ps(c0, c2);
-
-	int m = _mm_movemask_ps((__m128)c0);
-	return (0x7 == (m & 0x7));
-
-#else
 	return (m1[0][0] == m2[0][0] && m1[1][0] == m2[1][0] && m1[2][0] == m2[2][0] &&
 			m1[0][1] == m2[0][1] && m1[1][1] == m2[1][1] && m1[2][1] == m2[2][1] &&
 			m1[0][2] == m2[0][2] && m1[1][2] == m2[1][2] && m1[2][2] == m2[2][2]);
-#endif
 }
 
 ///for serialization

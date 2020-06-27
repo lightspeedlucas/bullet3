@@ -109,7 +109,7 @@ void btConvexTriangleCallback::processTriangle(btVector3* triangle, int partId, 
 		btCollisionObjectWrapper triObWrap(m_triBodyWrap, &tm, m_triBodyWrap->getCollisionObject(), m_triBodyWrap->getWorldTransform(), partId, triangleIndex);  //correct transform?
 		btCollisionAlgorithm* colAlgo = 0;
 
-		if (m_resultOut->m_closestPointDistanceThreshold > 0)
+		if (m_resultOut->m_closestPointDistanceThreshold > btScalar(0))
 		{
 			colAlgo = ci.m_dispatcher1->findAlgorithm(m_convexBodyWrap, &triObWrap, 0, BT_CLOSEST_POINT_ALGORITHMS);
 		}
@@ -209,7 +209,7 @@ void btConvexConcaveCollisionAlgorithm::processCollision(const btCollisionObject
 				{
 					queryVertices.push_back(btVector3(0, 0, 0));
 					btSphereShape* sphere = (btSphereShape*)convex;
-					maxDist = sphere->getRadius() + SIMD_EPSILON;
+					maxDist = sphere->getRadius() + btScalar(SIMD_EPSILON);
 				}
 				if (queryVertices.size())
 				{

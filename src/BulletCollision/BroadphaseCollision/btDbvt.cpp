@@ -249,7 +249,7 @@ static bool leftOfAxis(const btDbvtNode* node,
 					   const btVector3& org,
 					   const btVector3& axis)
 {
-	return btDot(axis, node->volume.Center() - org) <= 0;
+	return btDot(axis, node->volume.Center() - org) <= btScalar(0);
 }
 
 // Partitions leaves such that leaves[0, n) are on the
@@ -374,7 +374,7 @@ static btDbvtNode* topdown(btDbvt* pdbvt,
 				const btVector3 x = leaves[i]->volume.Center() - org;
 				for (int j = 0; j < 3; ++j)
 				{
-					++splitcount[j][btDot(x, axis[j]) > 0 ? 1 : 0];
+					++splitcount[j][btDot(x, axis[j]) > btScalar(0) ? 1 : 0];
 				}
 			}
 			for (i = 0; i < 3; ++i)

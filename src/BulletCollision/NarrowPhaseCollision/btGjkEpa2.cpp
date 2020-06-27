@@ -447,7 +447,7 @@ struct GJK
 			}
 			else
 			{
-				w[0] = 1 - (w[1] = t);
+				w[0] = btScalar(1) - (w[1] = t);
 				m = 3;
 				return ((a + d * t).length2());
 			}
@@ -494,7 +494,7 @@ struct GJK
 				m = 7;
 				w[0] = (btCross(dl[1], b - p)).length() / s;
 				w[1] = (btCross(dl[2], c - p)).length() / s;
-				w[2] = 1 - (w[0] + w[1]);
+				w[2] = btScalar(1) - (w[0] + w[1]);
 			}
 			return (mindist);
 		}
@@ -543,7 +543,7 @@ struct GJK
 				w[0] = det(c, b, d) / vl;
 				w[1] = det(a, c, d) / vl;
 				w[2] = det(b, a, d) / vl;
-				w[3] = 1 - (w[0] + w[1] + w[2]);
+				w[3] = btScalar(1) - (w[0] + w[1] + w[2]);
 			}
 			return (mindist);
 		}
@@ -1060,7 +1060,7 @@ btScalar btGjkEpaSolver2::SignedDistance(const btVector3& position,
 				const btVector3 delta = results.witnesses[0] -
 										results.witnesses[1];
 				const btScalar length = delta.length();
-				if (length >= SIMD_EPSILON)
+				if (length >= btScalar(SIMD_EPSILON))
 					results.normal = delta / length;
 				return (-length);
 			}

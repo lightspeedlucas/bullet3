@@ -304,7 +304,7 @@ int btQuantizedBvh::calcSplittingAxis(int startIndex, int endIndex)
 		diff2 = diff2 * diff2;
 		variance += diff2;
 	}
-	variance *= (btScalar(1.) / ((btScalar)numIndices - 1));
+	variance *= (btScalar(1.) / (btScalar(numIndices) - btScalar(1)));
 
 	return variance.maxAxis();
 }
@@ -475,7 +475,7 @@ void btQuantizedBvh::walkStacklessTreeAgainstRay(btNodeOverlapCallback* nodeCall
 	rayDirectionInverse[0] = rayDir[0] == btScalar(0.0) ? btScalar(BT_LARGE_FLOAT) : btScalar(1.0) / rayDir[0];
 	rayDirectionInverse[1] = rayDir[1] == btScalar(0.0) ? btScalar(BT_LARGE_FLOAT) : btScalar(1.0) / rayDir[1];
 	rayDirectionInverse[2] = rayDir[2] == btScalar(0.0) ? btScalar(BT_LARGE_FLOAT) : btScalar(1.0) / rayDir[2];
-	unsigned int sign[3] = {rayDirectionInverse[0] < 0.0, rayDirectionInverse[1] < 0.0, rayDirectionInverse[2] < 0.0};
+	unsigned int sign[3] = {rayDirectionInverse[0] < btScalar(0), rayDirectionInverse[1] < btScalar(0), rayDirectionInverse[2] < btScalar(0)};
 #endif
 
 	btVector3 bounds[2];
@@ -560,7 +560,7 @@ void btQuantizedBvh::walkStacklessQuantizedTreeAgainstRay(btNodeOverlapCallback*
 	rayDirection[0] = rayDirection[0] == btScalar(0.0) ? btScalar(BT_LARGE_FLOAT) : btScalar(1.0) / rayDirection[0];
 	rayDirection[1] = rayDirection[1] == btScalar(0.0) ? btScalar(BT_LARGE_FLOAT) : btScalar(1.0) / rayDirection[1];
 	rayDirection[2] = rayDirection[2] == btScalar(0.0) ? btScalar(BT_LARGE_FLOAT) : btScalar(1.0) / rayDirection[2];
-	unsigned int sign[3] = {rayDirection[0] < 0.0, rayDirection[1] < 0.0, rayDirection[2] < 0.0};
+	unsigned int sign[3] = {rayDirection[0] < btScalar(0), rayDirection[1] < btScalar(0), rayDirection[2] < btScalar(0)};
 #endif
 
 	/* Quick pruning by quantized box */

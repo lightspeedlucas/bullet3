@@ -47,7 +47,7 @@ btBoxBoxDetector::btBoxBoxDetector(const btBoxShape* box1, const btBoxShape* box
 // fields.
 struct dContactGeom;
 #define dDOTpq(a, b, p, q) ((a)[0] * (b)[0] + (a)[p] * (b)[q] + (a)[2 * (p)] * (b)[2 * (q)])
-#define dInfinity FLT_MAX
+#define dInfinity 999999999999
 
 /*PURE_INLINE btScalar dDOT   (const btScalar *a, const btScalar *b) { return dDOTpq(a,b,1,1); }
 PURE_INLINE btScalar dDOT13 (const btScalar *a, const btScalar *b) { return dDOTpq(a,b,1,3); }
@@ -91,7 +91,7 @@ void dLineClosestApproach(const btVector3& pa, const btVector3& ua,
 	btScalar uaub = dDOT(ua, ub);
 	btScalar q1 = dDOT(ua, p);
 	btScalar q2 = -dDOT(ub, p);
-	btScalar d = 1 - uaub * uaub;
+	btScalar d = btScalar(1) - uaub * uaub;
 	if (d <= btScalar(0.0001f))
 	{
 		// @@@ this needs to be made more robust
@@ -100,7 +100,7 @@ void dLineClosestApproach(const btVector3& pa, const btVector3& ua,
 	}
 	else
 	{
-		d = 1.f / d;
+		d = btScalar(1) / d;
 		*alpha = (q1 + uaub * q2) * d;
 		*beta = (uaub * q1 + q2) * d;
 	}
@@ -134,7 +134,7 @@ static int intersectRectQuad2(btScalar h[2], btScalar p[8], btScalar ret[16])
 			for (int i = nq; i > 0; i--)
 			{
 				// go through all points in q and all lines between adjacent points
-				if (sign * pq[dir] < h[dir])
+				if (btScalar(sign) * pq[dir] < h[dir])
 				{
 					// this point is inside the chopping line
 					pr[0] = pq[0];
@@ -148,12 +148,12 @@ static int intersectRectQuad2(btScalar h[2], btScalar p[8], btScalar ret[16])
 					}
 				}
 				btScalar* nextq = (i > 1) ? pq + 2 : q;
-				if ((sign * pq[dir] < h[dir]) ^ (sign * nextq[dir] < h[dir]))
+				if ((btScalar(sign) * pq[dir] < h[dir]) ^ (btScalar(sign) * nextq[dir] < h[dir]))
 				{
 					// this line crosses the chopping line
 					pr[1 - dir] = pq[1 - dir] + (nextq[1 - dir] - pq[1 - dir]) /
-													(nextq[dir] - pq[dir]) * (sign * h[dir] - pq[dir]);
-					pr[dir] = sign * h[dir];
+													(nextq[dir] - pq[dir]) * (btScalar(sign) * h[dir] - pq[dir]);
+					pr[dir] = btScalar(sign) * h[dir];
 					pr += 2;
 					nr++;
 					if (nr & 8)
@@ -213,13 +213,13 @@ void cullPoints2(int n, btScalar p[], int m, int i0, int iret[])
 			cy += q * (p[i * 2 + 1] + p[i * 2 + 3]);
 		}
 		q = p[n * 2 - 2] * p[1] - p[0] * p[n * 2 - 1];
-		if (btFabs(a + q) > SIMD_EPSILON)
+		if (btFabs(a + q) > btScalar(SIMD_EPSILON))
 		{
-			a = 1.f / (btScalar(3.0) * (a + q));
+			a = btScalar(1) / (btScalar(3) * (a + q));
 		}
 		else
 		{
-			a = BT_LARGE_FLOAT;
+			a = btScalar(BT_LARGE_FLOAT);
 		}
 		cx = a * (cx + q * (p[n * 2 - 2] + p[0]));
 		cy = a * (cy + q * (p[n * 2 - 1] + p[1]));
@@ -237,8 +237,8 @@ void cullPoints2(int n, btScalar p[], int m, int i0, int iret[])
 	iret++;
 	for (j = 1; j < m; j++)
 	{
-		a = btScalar(j) * (2 * M__PI / m) + A[i0];
-		if (a > M__PI) a -= 2 * M__PI;
+		a = btScalar(j) * (btScalar(2) * btScalar(M__PI) / btScalar(m)) + A[i0];
+		if (a > btScalar(M__PI)) a -= btScalar(2) * btScalar(M__PI);
 		btScalar maxdiff = 1e9, diff;
 
 		*iret = i0;  // iret is not allowed to keep this value, but it sometimes does, when diff=#QNAN0
@@ -248,7 +248,7 @@ void cullPoints2(int n, btScalar p[], int m, int i0, int iret[])
 			if (avail[i])
 			{
 				diff = btFabs(A[i] - a);
-				if (diff > M__PI) diff = 2 * M__PI - diff;
+				if (diff > btScalar(M__PI)) diff = btScalar(2) * btScalar(M__PI) - diff;
 				if (diff < maxdiff)
 				{
 					maxdiff = diff;
@@ -327,12 +327,12 @@ int dBoxBox2(const btVector3& p1, const dMatrix3 R1,
 
 #define TST(expr1, expr2, norm, cc)    \
 	s2 = btFabs(expr1) - (expr2);      \
-	if (s2 > 0) return 0;              \
+	if (s2 > btScalar(0)) return 0;              \
 	if (s2 > s)                        \
 	{                                  \
 		s = s2;                        \
 		normalR = norm;                \
-		invert_normal = ((expr1) < 0); \
+		invert_normal = ((expr1) < btScalar(0)); \
 		code = (cc);                   \
 	}
 
@@ -355,9 +355,9 @@ int dBoxBox2(const btVector3& p1, const dMatrix3 R1,
 #undef TST
 #define TST(expr1, expr2, n1, n2, n3, cc)                \
 	s2 = btFabs(expr1) - (expr2);                        \
-	if (s2 > SIMD_EPSILON) return 0;                     \
+	if (s2 > btScalar(SIMD_EPSILON)) return 0;                     \
 	l = btSqrt((n1) * (n1) + (n2) * (n2) + (n3) * (n3)); \
-	if (l > SIMD_EPSILON)                                \
+	if (l > btScalar(SIMD_EPSILON))                                \
 	{                                                    \
 		s2 /= l;                                         \
 		if (s2 * fudge_factor > s)                       \
@@ -367,7 +367,7 @@ int dBoxBox2(const btVector3& p1, const dMatrix3 R1,
 			normalC[0] = (n1) / l;                       \
 			normalC[1] = (n2) / l;                       \
 			normalC[2] = (n3) / l;                       \
-			invert_normal = ((expr1) < 0);               \
+			invert_normal = ((expr1) < btScalar(0));               \
 			code = (cc);                                 \
 		}                                                \
 	}
@@ -387,19 +387,19 @@ int dBoxBox2(const btVector3& p1, const dMatrix3 R1,
 	Q33 += fudge2;
 
 	// separating axis = u1 x (v1,v2,v3)
-	TST(pp[2] * R21 - pp[1] * R31, (A[1] * Q31 + A[2] * Q21 + B[1] * Q13 + B[2] * Q12), 0, -R31, R21, 7);
-	TST(pp[2] * R22 - pp[1] * R32, (A[1] * Q32 + A[2] * Q22 + B[0] * Q13 + B[2] * Q11), 0, -R32, R22, 8);
-	TST(pp[2] * R23 - pp[1] * R33, (A[1] * Q33 + A[2] * Q23 + B[0] * Q12 + B[1] * Q11), 0, -R33, R23, 9);
+	TST(pp[2] * R21 - pp[1] * R31, (A[1] * Q31 + A[2] * Q21 + B[1] * Q13 + B[2] * Q12), btScalar(0), -R31, R21, 7);
+	TST(pp[2] * R22 - pp[1] * R32, (A[1] * Q32 + A[2] * Q22 + B[0] * Q13 + B[2] * Q11), btScalar(0), -R32, R22, 8);
+	TST(pp[2] * R23 - pp[1] * R33, (A[1] * Q33 + A[2] * Q23 + B[0] * Q12 + B[1] * Q11), btScalar(0), -R33, R23, 9);
 
 	// separating axis = u2 x (v1,v2,v3)
-	TST(pp[0] * R31 - pp[2] * R11, (A[0] * Q31 + A[2] * Q11 + B[1] * Q23 + B[2] * Q22), R31, 0, -R11, 10);
-	TST(pp[0] * R32 - pp[2] * R12, (A[0] * Q32 + A[2] * Q12 + B[0] * Q23 + B[2] * Q21), R32, 0, -R12, 11);
-	TST(pp[0] * R33 - pp[2] * R13, (A[0] * Q33 + A[2] * Q13 + B[0] * Q22 + B[1] * Q21), R33, 0, -R13, 12);
+	TST(pp[0] * R31 - pp[2] * R11, (A[0] * Q31 + A[2] * Q11 + B[1] * Q23 + B[2] * Q22), R31, btScalar(0), -R11, 10);
+	TST(pp[0] * R32 - pp[2] * R12, (A[0] * Q32 + A[2] * Q12 + B[0] * Q23 + B[2] * Q21), R32, btScalar(0), -R12, 11);
+	TST(pp[0] * R33 - pp[2] * R13, (A[0] * Q33 + A[2] * Q13 + B[0] * Q22 + B[1] * Q21), R33, btScalar(0), -R13, 12);
 
 	// separating axis = u3 x (v1,v2,v3)
-	TST(pp[1] * R11 - pp[0] * R21, (A[0] * Q21 + A[1] * Q11 + B[1] * Q33 + B[2] * Q32), -R21, R11, 0, 13);
-	TST(pp[1] * R12 - pp[0] * R22, (A[0] * Q22 + A[1] * Q12 + B[0] * Q33 + B[2] * Q31), -R22, R12, 0, 14);
-	TST(pp[1] * R13 - pp[0] * R23, (A[0] * Q23 + A[1] * Q13 + B[0] * Q32 + B[1] * Q31), -R23, R13, 0, 15);
+	TST(pp[1] * R11 - pp[0] * R21, (A[0] * Q21 + A[1] * Q11 + B[1] * Q33 + B[2] * Q32), -R21, R11, btScalar(0), 13);
+	TST(pp[1] * R12 - pp[0] * R22, (A[0] * Q22 + A[1] * Q12 + B[0] * Q33 + B[2] * Q31), -R22, R12, btScalar(0), 14);
+	TST(pp[1] * R13 - pp[0] * R23, (A[0] * Q23 + A[1] * Q13 + B[0] * Q32 + B[1] * Q31), -R23, R13, btScalar(0), 15);
 
 #undef TST
 
@@ -436,7 +436,7 @@ int dBoxBox2(const btVector3& p1, const dMatrix3 R1,
 		for (i = 0; i < 3; i++) pa[i] = p1[i];
 		for (j = 0; j < 3; j++)
 		{
-			sign = (dDOT14(normal, R1 + j) > 0) ? btScalar(1.0) : btScalar(-1.0);
+			sign = (dDOT14(normal, R1 + j) > btScalar(0)) ? btScalar(1.0) : btScalar(-1.0);
 			for (i = 0; i < 3; i++) pa[i] += sign * A[j] * R1[i * 4 + j];
 		}
 
@@ -445,7 +445,7 @@ int dBoxBox2(const btVector3& p1, const dMatrix3 R1,
 		for (i = 0; i < 3; i++) pb[i] = p2[i];
 		for (j = 0; j < 3; j++)
 		{
-			sign = (dDOT14(normal, R2 + j) > 0) ? btScalar(-1.0) : btScalar(1.0);
+			sign = (dDOT14(normal, R2 + j) > btScalar(0)) ? btScalar(-1.0) : btScalar(1.0);
 			for (i = 0; i < 3; i++) pb[i] += sign * B[j] * R2[i * 4 + j];
 		}
 
@@ -558,7 +558,7 @@ int dBoxBox2(const btVector3& p1, const dMatrix3 R1,
 
 	// compute center point of incident face, in reference-face coordinates
 	btVector3 center;
-	if (nr[lanr] < 0)
+	if (nr[lanr] < btScalar(0))
 	{
 		for (i = 0; i < 3; i++) center[i] = pb[i] - pa[i] + Sb[lanr] * Rb[i * 4 + lanr];
 	}
@@ -632,7 +632,7 @@ int dBoxBox2(const btVector3& p1, const dMatrix3 R1,
 	// the 'ret' array as necessary so that 'point' and 'ret' correspond.
 	btScalar point[3 * 8];  // penetrating contact points
 	btScalar dep[8];        // depths for those points
-	btScalar det1 = 1.f / (m11 * m22 - m12 * m21);
+	btScalar det1 = btScalar(1) / (m11 * m22 - m12 * m21);
 	m11 *= det1;
 	m12 *= det1;
 	m21 *= det1;
@@ -645,7 +645,7 @@ int dBoxBox2(const btVector3& p1, const dMatrix3 R1,
 		for (i = 0; i < 3; i++) point[cnum * 3 + i] =
 									center[i] + k1 * Rb[i * 4 + a1] + k2 * Rb[i * 4 + a2];
 		dep[cnum] = Sa[codeN] - dDOT(normal2, point + cnum * 3);
-		if (dep[cnum] >= 0)
+		if (dep[cnum] >= btScalar(0))
 		{
 			ret[cnum * 2] = ret[j * 2];
 			ret[cnum * 2 + 1] = ret[j * 2 + 1];

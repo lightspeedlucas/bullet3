@@ -44,7 +44,7 @@ public:
 		btVector3 axis;
 		btScalar fAngle2 = angvel.length2();
 		btScalar fAngle = 0;
-		if (fAngle2 > SIMD_EPSILON)
+		if (fAngle2 > btScalar(SIMD_EPSILON))
 		{
 			fAngle = btSqrt(fAngle2);
 		}
@@ -71,7 +71,7 @@ public:
 		btQuaternion predictedOrn = dorn * orn0;
 		predictedOrn.safeNormalize();
 #endif
-		if (predictedOrn.length2() > SIMD_EPSILON)
+		if (predictedOrn.length2() > btScalar(SIMD_EPSILON))
 		{
 			predictedTransform.setRotation(predictedOrn);
 		}
@@ -106,7 +106,7 @@ public:
 		axis[3] = btScalar(0.);
 		//check for axis length
 		btScalar len = axis.length2();
-		if (len < SIMD_EPSILON * SIMD_EPSILON)
+		if (len < btScalar(SIMD_EPSILON) * btScalar(SIMD_EPSILON))
 			axis = btVector3(btScalar(1.), btScalar(0.), btScalar(0.));
 		else
 			axis /= btSqrt(len);
@@ -135,7 +135,7 @@ public:
 		axis[3] = btScalar(0.);
 		//check for axis length
 		btScalar len = axis.length2();
-		if (len < SIMD_EPSILON * SIMD_EPSILON)
+		if (len < btScalar(SIMD_EPSILON) * btScalar(SIMD_EPSILON))
 			axis = btVector3(btScalar(1.), btScalar(0.), btScalar(0.));
 		else
 			axis /= btSqrt(len);
@@ -177,7 +177,7 @@ public:
 		btQuaternion toOrnA = transA.getRotation();
 		btQuaternion toOrnB = transB.getRotation();
 
-		if (m_separatingDistance > 0.f)
+		if (m_separatingDistance > btScalar(0))
 		{
 			btVector3 linVelA, angVelA, linVelB, angVelB;
 			btTransformUtil::calculateVelocityQuaternion(m_posA, toPosA, m_ornA, toOrnA, btScalar(1.), linVelA, angVelA);
@@ -185,9 +185,9 @@ public:
 			btScalar maxAngularProjectedVelocity = angVelA.length() * m_boundingRadiusA + angVelB.length() * m_boundingRadiusB;
 			btVector3 relLinVel = (linVelB - linVelA);
 			btScalar relLinVelocLength = relLinVel.dot(m_separatingNormal);
-			if (relLinVelocLength < 0.f)
+			if (relLinVelocLength < btScalar(0.f))
 			{
-				relLinVelocLength = 0.f;
+				relLinVelocLength = btScalar(0);
 			}
 
 			btScalar projectedMotion = maxAngularProjectedVelocity + relLinVelocLength;
@@ -204,7 +204,7 @@ public:
 	{
 		m_separatingDistance = separatingDistance;
 
-		if (m_separatingDistance > 0.f)
+		if (m_separatingDistance > btScalar(0))
 		{
 			m_separatingNormal = separatingVector;
 

@@ -103,7 +103,7 @@ btVector3 btConvexHullShape::localGetSupportingVertex(const btVector3& vec) cons
 	if (getMargin() != btScalar(0.))
 	{
 		btVector3 vecnorm = vec;
-		if (vecnorm.length2() < (SIMD_EPSILON * SIMD_EPSILON))
+		if (vecnorm.length2() < btScalar(SIMD_EPSILON) * btScalar(SIMD_EPSILON))
 		{
 			vecnorm.setValue(btScalar(-1.), btScalar(-1.), btScalar(-1.));
 		}
@@ -116,7 +116,7 @@ btVector3 btConvexHullShape::localGetSupportingVertex(const btVector3& vec) cons
 void btConvexHullShape::optimizeConvexHull()
 {
 	btConvexHullComputer conv;
-	conv.compute(&m_unscaledPoints[0].getX(), sizeof(btVector3), m_unscaledPoints.size(), 0.f, 0.f);
+	conv.compute(&m_unscaledPoints[0].getX(), sizeof(btVector3), m_unscaledPoints.size(), btScalar(0), btScalar(0));
 	int numVerts = conv.vertices.size();
 	m_unscaledPoints.resize(0);
 	for (int i = 0; i < numVerts; i++)
@@ -207,8 +207,8 @@ const char* btConvexHullShape::serialize(void* dataBuffer, btSerializer* seriali
 void btConvexHullShape::project(const btTransform& trans, const btVector3& dir, btScalar& minProj, btScalar& maxProj, btVector3& witnesPtMin, btVector3& witnesPtMax) const
 {
 #if 1
-	minProj = FLT_MAX;
-	maxProj = -FLT_MAX;
+	minProj = btScalar(99999999999LL);
+	maxProj = btScalar(-99999999999LL);
 
 	int numVerts = m_unscaledPoints.size();
 	for (int i = 0; i < numVerts; i++)

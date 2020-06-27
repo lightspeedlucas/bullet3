@@ -20,8 +20,6 @@ subject to the following restrictions:
 #include "btPolyhedralContactClipping.h"
 #include "BulletCollision/CollisionShapes/btConvexPolyhedron.h"
 
-#include <float.h>  //for FLT_MAX
-
 int gExpectedNbTests = 0;
 int gActualNbTests = 0;
 bool gUseInternalObject = true;
@@ -110,7 +108,7 @@ static int gActualSATPairTests = 0;
 
 inline bool IsAlmostZero(const btVector3& v)
 {
-	if (btFabs(v.x()) > 1e-6 || btFabs(v.y()) > 1e-6 || btFabs(v.z()) > 1e-6) return false;
+	if (btFabs(v.x()) > btScalar(1e-6) || btFabs(v.y()) > btScalar(1e-6) || btFabs(v.z()) > btScalar(1e-6)) return false;
 	return true;
 }
 
@@ -122,9 +120,9 @@ inline void BoxSupport(const btScalar extents[3], const btScalar sv[3], btScalar
 	//	IR(p[0]) = IR(extents[0])|(IR(sv[0])&SIGN_BITMASK);
 	//	IR(p[1]) = IR(extents[1])|(IR(sv[1])&SIGN_BITMASK);
 	//	IR(p[2]) = IR(extents[2])|(IR(sv[2])&SIGN_BITMASK);
-	p[0] = sv[0] < 0.0f ? -extents[0] : extents[0];
-	p[1] = sv[1] < 0.0f ? -extents[1] : extents[1];
-	p[2] = sv[2] < 0.0f ? -extents[2] : extents[2];
+	p[0] = sv[0] < btScalar(0) ? -extents[0] : extents[0];
+	p[1] = sv[1] < btScalar(0) ? -extents[1] : extents[1];
+	p[2] = sv[2] < btScalar(0) ? -extents[2] : extents[2];
 }
 
 void InverseTransformPoint3x3(btVector3& out, const btVector3& in, const btTransform& tr)
@@ -187,11 +185,11 @@ SIMD_FORCE_INLINE void btSegmentsClosestPoints(
 	btScalar dirA_dot_trans = btDot(dirA, translation);
 	btScalar dirB_dot_trans = btDot(dirB, translation);
 
-	btScalar denom = 1.0f - dirA_dot_dirB * dirA_dot_dirB;
+	btScalar denom = btScalar(1) - dirA_dot_dirB * dirA_dot_dirB;
 
-	if (denom == 0.0f)
+	if (denom == btScalar(0))
 	{
-		tA = 0.0f;
+		tA = btScalar(0);
 	}
 	else
 	{
@@ -243,7 +241,7 @@ bool btPolyhedralContactClipping::findSeparatingAxis(const btConvexPolyhedron& h
 	const btVector3 DeltaC2 = c0 - c1;
 	//#endif
 
-	btScalar dmin = FLT_MAX;
+	btScalar dmin = btScalar(999999999LL);
 	int curPlaneTests = 0;
 
 	int numFacesA = hullA.m_faces.size();
@@ -382,13 +380,13 @@ bool btPolyhedralContactClipping::findSeparatingAxis(const btConvexPolyhedron& h
 								dirB, hlenB);
 
 		btScalar nlSqrt = ptsVector.length2();
-		if (nlSqrt > SIMD_EPSILON)
+		if (nlSqrt > btScalar(SIMD_EPSILON))
 		{
 			btScalar nl = btSqrt(nlSqrt);
-			ptsVector *= 1.f / nl;
+			ptsVector *= btScalar(1) / nl;
 			if (ptsVector.dot(DeltaC2) < 0.f)
 			{
-				ptsVector *= -1.f;
+				ptsVector *= btScalar(-1);
 			}
 			btVector3 ptOnB = witnessPointB + offsetB;
 			btScalar distance = nl;
@@ -411,7 +409,7 @@ void btPolyhedralContactClipping::clipFaceAgainstHull(const btVector3& separatin
 
 	int closestFaceA = -1;
 	{
-		btScalar dmin = FLT_MAX;
+		btScalar dmin = btScalar(999999999LL);
 		for (int face = 0; face < hullA.m_faces.size(); face++)
 		{
 			const btVector3 Normal(hullA.m_faces[face].m_plane[0], hullA.m_faces[face].m_plane[1], hullA.m_faces[face].m_plane[2]);
@@ -518,7 +516,7 @@ void btPolyhedralContactClipping::clipHullAgainstHull(const btVector3& separatin
 	//const btVector3 DeltaC2 = c0 - c1;
 
 	int closestFaceB = -1;
-	btScalar dmax = -FLT_MAX;
+	btScalar dmax = -btScalar(999999999LL);
 	{
 		for (int face = 0; face < hullB.m_faces.size(); face++)
 		{

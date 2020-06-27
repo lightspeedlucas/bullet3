@@ -144,7 +144,7 @@ public:
 			btCollisionAlgorithm* algo = 0;
 			bool allocatedAlgorithm = false;
 
-			if (m_resultOut->m_closestPointDistanceThreshold > 0)
+			if (m_resultOut->m_closestPointDistanceThreshold > btScalar(0))
 			{
 				algo = m_dispatcher->findAlgorithm(&compoundWrap, m_otherObjWrap, 0, BT_CLOSEST_POINT_ALGORITHMS);
 				allocatedAlgorithm = true;

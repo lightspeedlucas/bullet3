@@ -123,7 +123,7 @@ SIMD_FORCE_INLINE void bt_segment_collision(
 
 	btVector4 _M;  //plane
 
-	if (tp < SIMD_EPSILON)  //ARE PARALELE
+	if (tp < btScalar(SIMD_EPSILON))  //ARE PARALELE
 	{
 		//project B over A
 		bool invert_b_order = false;

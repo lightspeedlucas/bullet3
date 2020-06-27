@@ -272,13 +272,13 @@ int btComputeGjkEpaPenetration(const btConvexTemplate& a, const btConvexTemplate
 			{
 				btVector3 tmpNormalInB = tmpPointOnB - tmpPointOnA;
 				btScalar lenSqr = tmpNormalInB.length2();
-				if (lenSqr <= (SIMD_EPSILON * SIMD_EPSILON))
+				if (lenSqr <= btScalar(SIMD_EPSILON) * btScalar(SIMD_EPSILON))
 				{
 					tmpNormalInB = m_cachedSeparatingAxis;
 					lenSqr = m_cachedSeparatingAxis.length2();
 				}
 
-				if (lenSqr > (SIMD_EPSILON * SIMD_EPSILON))
+				if (lenSqr > btScalar(SIMD_EPSILON) * btScalar(SIMD_EPSILON))
 				{
 					tmpNormalInB /= btSqrt(lenSqr);
 					btScalar distance2 = -(tmpPointOnA - tmpPointOnB).length();

@@ -412,7 +412,7 @@ SIMD_FORCE_INLINE void SEGMENT_COLLISION(
 	VEC_DIFF(_BD, vB2, vB1);
 	VEC_CROSS(n, _AD, _BD);
 	GREAL _tp = VEC_DOT(n, n);
-	if (_tp < G_EPSILON)  //ARE PARALELE
+	if (_tp < btScalar(G_EPSILON))  //ARE PARALELE
 	{
 		//project B over A
 		bool invert_b_order = false;

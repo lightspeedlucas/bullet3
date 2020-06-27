@@ -50,7 +50,7 @@ btVector3 btMultiSphereShape::localGetSupportingVertexWithoutMargin(const btVect
 
 	btVector3 vec = vec0;
 	btScalar lenSqr = vec.length2();
-	if (lenSqr < (SIMD_EPSILON * SIMD_EPSILON))
+	if (lenSqr < btScalar(SIMD_EPSILON) * btScalar(SIMD_EPSILON))
 	{
 		vec.setValue(1, 0, 0);
 	}
@@ -157,7 +157,7 @@ const char* btMultiSphereShape::serialize(void* dataBuffer, btSerializer* serial
 		for (int i = 0; i < numElem; i++, memPtr++)
 		{
 			m_localPositionArray[i].serializeFloat(memPtr->m_pos);
-			memPtr->m_radius = float(m_radiArray[i]);
+			memPtr->m_radius = m_radiArray[i].ToFloat();
 		}
 		serializer->finalizeChunk(chunk, "btPositionAndRadius", BT_ARRAY_CODE, (void*)&m_localPositionArray[0]);
 	}

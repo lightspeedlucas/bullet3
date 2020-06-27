@@ -213,14 +213,14 @@ btVector3 btConvexShape::localGetSupportVertexWithoutMarginNonVirtual(const btVe
 			{
 				d = radius / s;
 				tmp[XX] = v[XX] * d;
-				tmp[YY] = v[YY] < 0.0 ? -halfHeight : halfHeight;
+				tmp[YY] = v[YY] < btScalar(0.0) ? -halfHeight : halfHeight;
 				tmp[ZZ] = v[ZZ] * d;
 				return btVector3(tmp.getX(), tmp.getY(), tmp.getZ());
 			}
 			else
 			{
 				tmp[XX] = radius;
-				tmp[YY] = v[YY] < 0.0 ? -halfHeight : halfHeight;
+				tmp[YY] = v[YY] < btScalar(0.0) ? -halfHeight : halfHeight;
 				tmp[ZZ] = btScalar(0.0);
 				return btVector3(tmp.getX(), tmp.getY(), tmp.getZ());
 			}
@@ -239,7 +239,7 @@ btVector3 btConvexShape::localGetSupportVertexWithoutMarginNonVirtual(const btVe
 
 			btVector3 vec = vec0;
 			btScalar lenSqr = vec.length2();
-			if (lenSqr < SIMD_EPSILON * SIMD_EPSILON)
+			if (lenSqr < btScalar(SIMD_EPSILON) * btScalar(SIMD_EPSILON))
 			{
 				vec.setValue(1, 0, 0);
 			}
@@ -307,7 +307,7 @@ btVector3 btConvexShape::localGetSupportVertexWithoutMarginNonVirtual(const btVe
 btVector3 btConvexShape::localGetSupportVertexNonVirtual(const btVector3& localDir) const
 {
 	btVector3 localDirNorm = localDir;
-	if (localDirNorm.length2() < (SIMD_EPSILON * SIMD_EPSILON))
+	if (localDirNorm.length2() < btScalar(SIMD_EPSILON) * btScalar(SIMD_EPSILON))
 	{
 		localDirNorm.setValue(btScalar(-1.), btScalar(-1.), btScalar(-1.));
 	}

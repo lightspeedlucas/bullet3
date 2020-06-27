@@ -701,7 +701,7 @@ void btGImpactCollisionAlgorithm::gimpacttrimeshpart_vs_plane_collision(
 
 		btScalar distance = vertex.dot(plane) - plane[3] - margin;
 
-		if (distance < 0.0)  //add contact
+		if (distance < btScalar(0))  //add contact
 		{
 			if (swapped)
 			{

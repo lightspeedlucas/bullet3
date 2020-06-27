@@ -163,7 +163,7 @@ void btContactArray::merge_contacts_unique(const btContactArray& contacts)
 	}
 
 	//divide
-	btScalar divide_average = 1.0f / ((btScalar)contacts.size());
+	btScalar divide_average = btScalar(1) / ((btScalar)contacts.size());
 
 	average_contact.m_point *= divide_average;
 

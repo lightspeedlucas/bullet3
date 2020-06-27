@@ -135,7 +135,7 @@ void btBvhTriangleMeshShape::performRaycast(btTriangleCallback* callback, const 
 				{
 					float* graphicsbase = (float*)(vertexbase + graphicsindex * stride);
 
-					m_triangle[j] = btVector3(graphicsbase[0] * meshScaling.getX(), graphicsbase[1] * meshScaling.getY(), graphicsbase[2] * meshScaling.getZ());
+					m_triangle[j] = btVector3(btScalar(graphicsbase[0]) * meshScaling.getX(), btScalar(graphicsbase[1]) * meshScaling.getY(), btScalar(graphicsbase[2]) * meshScaling.getZ());
 				}
 				else
 				{
@@ -204,7 +204,7 @@ void btBvhTriangleMeshShape::performConvexcast(btTriangleCallback* callback, con
 				{
 					float* graphicsbase = (float*)(vertexbase + graphicsindex * stride);
 
-					m_triangle[j] = btVector3(graphicsbase[0] * meshScaling.getX(), graphicsbase[1] * meshScaling.getY(), graphicsbase[2] * meshScaling.getZ());
+					m_triangle[j] = btVector3(btScalar(graphicsbase[0]) * meshScaling.getX(), btScalar(graphicsbase[1]) * meshScaling.getY(), btScalar(graphicsbase[2]) * meshScaling.getZ());
 				}
 				else
 				{
@@ -288,9 +288,9 @@ void btBvhTriangleMeshShape::processAllTriangles(btTriangleCallback* callback, c
 					float* graphicsbase = (float*)(vertexbase + graphicsindex * stride);
 
 					m_triangle[j] = btVector3(
-						graphicsbase[0] * meshScaling.getX(),
-						graphicsbase[1] * meshScaling.getY(),
-						graphicsbase[2] * meshScaling.getZ());
+						btScalar(graphicsbase[0]) * meshScaling.getX(),
+						btScalar(graphicsbase[1]) * meshScaling.getY(),
+						btScalar(graphicsbase[2]) * meshScaling.getZ());
 				}
 				else
 				{
@@ -320,7 +320,7 @@ void btBvhTriangleMeshShape::processAllTriangles(btTriangleCallback* callback, c
 
 void btBvhTriangleMeshShape::setLocalScaling(const btVector3& scaling)
 {
-	if ((getLocalScaling() - scaling).length2() > SIMD_EPSILON)
+	if ((getLocalScaling() - scaling).length2() > btScalar(SIMD_EPSILON))
 	{
 		btTriangleMeshShape::setLocalScaling(scaling);
 		buildOptimizedBvh();
@@ -350,7 +350,7 @@ void btBvhTriangleMeshShape::setOptimizedBvh(btOptimizedBvh* bvh, const btVector
 	m_bvh = bvh;
 	m_ownsBvh = false;
 	// update the scaling without rebuilding the bvh
-	if ((getLocalScaling() - scaling).length2() > SIMD_EPSILON)
+	if ((getLocalScaling() - scaling).length2() > btScalar(SIMD_EPSILON))
 	{
 		btTriangleMeshShape::setLocalScaling(scaling);
 	}
@@ -365,7 +365,7 @@ const char* btBvhTriangleMeshShape::serialize(void* dataBuffer, btSerializer* se
 
 	m_meshInterface->serialize(&trimeshData->m_meshInterface, serializer);
 
-	trimeshData->m_collisionMargin = float(m_collisionMargin);
+	trimeshData->m_collisionMargin = m_collisionMargin.ToFloat();
 
 	if (m_bvh && !(serializer->getSerializationFlags() & BT_SERIALIZE_NO_BVH))
 	{

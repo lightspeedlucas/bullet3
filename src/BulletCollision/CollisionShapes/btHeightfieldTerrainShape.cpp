@@ -42,7 +42,7 @@ btHeightfieldTerrainShape::btHeightfieldTerrainShape(int heightStickWidth, int h
 
 	// previously, height = uchar * maxHeight / 65535.
 	// So to preserve legacy behavior, heightScale = maxHeight / 65535
-	btScalar heightScale = maxHeight / 65535;
+	btScalar heightScale = maxHeight / btScalar(65535);
 
 	initialize(heightStickWidth, heightStickLength, heightfieldData,
 			   heightScale, minHeight, maxHeight, upAxis, hdt,
@@ -157,14 +157,14 @@ btHeightfieldTerrainShape::getRawHeightFieldValue(int x, int y) const
 		case PHY_UCHAR:
 		{
 			unsigned char heightFieldValue = m_heightfieldDataUnsignedChar[(y * m_heightStickWidth) + x];
-			val = heightFieldValue * m_heightScale;
+			val = btScalar(heightFieldValue) * m_heightScale;
 			break;
 		}
 
 		case PHY_SHORT:
 		{
 			short hfValue = m_heightfieldDataShort[(y * m_heightStickWidth) + x];
-			val = hfValue * m_heightScale;
+			val = btScalar(hfValue) * m_heightScale;
 			break;
 		}
 
@@ -193,23 +193,23 @@ void btHeightfieldTerrainShape::getVertex(int x, int y, btVector3& vertex) const
 		{
 			vertex.setValue(
 				height - m_localOrigin.getX(),
-				(-m_width / btScalar(2.0)) + x,
-				(-m_length / btScalar(2.0)) + y);
+				(-m_width / btScalar(2.0)) + btScalar(x),
+				(-m_length / btScalar(2.0)) + btScalar(y));
 			break;
 		}
 		case 1:
 		{
 			vertex.setValue(
-				(-m_width / btScalar(2.0)) + x,
+				(-m_width / btScalar(2.0)) + btScalar(x),
 				height - m_localOrigin.getY(),
-				(-m_length / btScalar(2.0)) + y);
+				(-m_length / btScalar(2.0)) + btScalar(y));
 			break;
 		};
 		case 2:
 		{
 			vertex.setValue(
-				(-m_width / btScalar(2.0)) + x,
-				(-m_length / btScalar(2.0)) + y,
+				(-m_width / btScalar(2.0)) + btScalar(x),
+				(-m_length / btScalar(2.0)) + btScalar(y),
 				height - m_localOrigin.getZ());
 			break;
 		}
@@ -227,11 +227,11 @@ static inline int
 getQuantized(
 	btScalar x)
 {
-	if (x < 0.0)
+	if (x < btScalar(0.0))
 	{
-		return (int)(x - 0.5);
+		return (int)(x - btScalar(0.5));
 	}
-	return (int)(x + 0.5);
+	return (int)(x + btScalar(0.5));
 }
 
 /// given input vector, return quantized version
@@ -264,8 +264,8 @@ void btHeightfieldTerrainShape::quantizeWithClamp(int* out, const btVector3& poi
 void btHeightfieldTerrainShape::processAllTriangles(btTriangleCallback* callback, const btVector3& aabbMin, const btVector3& aabbMax) const
 {
 	// scale down the input aabb's so they are in local (non-scaled) coordinates
-	btVector3 localAabbMin = aabbMin * btVector3(1.f / m_localScaling[0], 1.f / m_localScaling[1], 1.f / m_localScaling[2]);
-	btVector3 localAabbMax = aabbMax * btVector3(1.f / m_localScaling[0], 1.f / m_localScaling[1], 1.f / m_localScaling[2]);
+	btVector3 localAabbMin = aabbMin * btVector3(btScalar(1) / m_localScaling[0], btScalar(1) / m_localScaling[1], btScalar(1) / m_localScaling[2]);
+	btVector3 localAabbMax = aabbMax * btVector3(btScalar(1) / m_localScaling[0], btScalar(1) / m_localScaling[1], btScalar(1) / m_localScaling[2]);
 
 	// account for local origin
 	localAabbMin += m_localOrigin;
@@ -419,7 +419,7 @@ void gridRaycast(Action_T& quadAction, const btVector3& beginPos, const btVector
 {
 	GridRaycastState rs;
 	rs.maxDistance3d = beginPos.distance(endPos);
-	if (rs.maxDistance3d < 0.0001)
+	if (rs.maxDistance3d < btScalar(0.0001))
 	{
 		// Consider the ray is too small to hit anything
 		return;
@@ -430,7 +430,7 @@ void gridRaycast(Action_T& quadAction, const btVector3& beginPos, const btVector
 	btScalar rayDirectionFlatZ = endPos[indices[2]] - beginPos[indices[2]];
 	rs.maxDistanceFlat = btSqrt(rayDirectionFlatX * rayDirectionFlatX + rayDirectionFlatZ * rayDirectionFlatZ);
 
-	if (rs.maxDistanceFlat < 0.0001)
+	if (rs.maxDistanceFlat < btScalar(0.0001))
 	{
 		// Consider the ray vertical
 		rayDirectionFlatX = 0;
@@ -445,9 +445,9 @@ void gridRaycast(Action_T& quadAction, const btVector3& beginPos, const btVector
 	const int xiStep = rayDirectionFlatX > 0 ? 1 : rayDirectionFlatX < 0 ? -1 : 0;
 	const int ziStep = rayDirectionFlatZ > 0 ? 1 : rayDirectionFlatZ < 0 ? -1 : 0;
 
-	const float infinite = 9999999;
-	const btScalar paramDeltaX = xiStep != 0 ? 1.f / btFabs(rayDirectionFlatX) : infinite;
-	const btScalar paramDeltaZ = ziStep != 0 ? 1.f / btFabs(rayDirectionFlatZ) : infinite;
+	const btScalar infinite = btScalar(9999999LL);
+	const btScalar paramDeltaX = xiStep != 0 ? btScalar(1) / btFabs(rayDirectionFlatX) : infinite;
+	const btScalar paramDeltaZ = ziStep != 0 ? btScalar(1) / btFabs(rayDirectionFlatZ) : infinite;
 
 	// pos = param * dir
 	btScalar paramCrossX;  // At which value of `param` we will cross a x-axis lane?
@@ -459,11 +459,11 @@ void gridRaycast(Action_T& quadAction, const btVector3& beginPos, const btVector
 	{
 		if (xiStep == 1)
 		{
-			paramCrossX = (ceil(beginPos[indices[0]]) - beginPos[indices[0]]) * paramDeltaX;
+			paramCrossX = (Q::Ceil(beginPos[indices[0]]) - beginPos[indices[0]]) * paramDeltaX;
 		}
 		else
 		{
-			paramCrossX = (beginPos[indices[0]] - floor(beginPos[indices[0]])) * paramDeltaX;
+			paramCrossX = (beginPos[indices[0]] - Q::Floor(beginPos[indices[0]])) * paramDeltaX;
 		}
 	}
 	else
@@ -476,11 +476,11 @@ void gridRaycast(Action_T& quadAction, const btVector3& beginPos, const btVector
 	{
 		if (ziStep == 1)
 		{
-			paramCrossZ = (ceil(beginPos[indices[2]]) - beginPos[indices[2]]) * paramDeltaZ;
+			paramCrossZ = (Q::Ceil(beginPos[indices[2]]) - beginPos[indices[2]]) * paramDeltaZ;
 		}
 		else
 		{
-			paramCrossZ = (beginPos[indices[2]] - floor(beginPos[indices[2]])) * paramDeltaZ;
+			paramCrossZ = (beginPos[indices[2]] - Q::Floor(beginPos[indices[2]])) * paramDeltaZ;
 		}
 	}
 	else
@@ -488,11 +488,11 @@ void gridRaycast(Action_T& quadAction, const btVector3& beginPos, const btVector
 		paramCrossZ = infinite;  // Will never cross on Z
 	}
 
-	rs.x = static_cast<int>(floor(beginPos[indices[0]]));
-	rs.z = static_cast<int>(floor(beginPos[indices[2]]));
+	rs.x = (Q::Floor(beginPos[indices[0]]).ToInt());
+	rs.z = (Q::Floor(beginPos[indices[2]]).ToInt());
 
 	// Workaround cases where the ray starts at an integer position
-	if (paramCrossX == 0.0)
+	if (paramCrossX == btScalar(0.0))
 	{
 		paramCrossX += paramDeltaX;
 		// If going backwards, we should ignore the position we would get by the above flooring,
@@ -503,7 +503,7 @@ void gridRaycast(Action_T& quadAction, const btVector3& beginPos, const btVector
 		}
 	}
 
-	if (paramCrossZ == 0.0)
+	if (paramCrossZ == btScalar(0))
 	{
 		paramCrossZ += paramDeltaZ;
 		if (ziStep == -1)
@@ -512,7 +512,7 @@ void gridRaycast(Action_T& quadAction, const btVector3& beginPos, const btVector
 
 	rs.prev_x = rs.x;
 	rs.prev_z = rs.z;
-	rs.param = 0;
+	rs.param = btScalar(0);
 
 	while (true)
 	{
@@ -641,9 +641,9 @@ struct ProcessVBoundsAction
 		btVector3 enterPos;
 		btVector3 exitPos;
 
-		if (rs.maxDistanceFlat > 0.0001)
+		if (rs.maxDistanceFlat > btScalar(0.0001))
 		{
-			btScalar flatTo3d = chunkSize * rs.maxDistance3d / rs.maxDistanceFlat;
+			btScalar flatTo3d = btScalar(chunkSize) * rs.maxDistance3d / rs.maxDistanceFlat;
 			btScalar enterParam3d = rs.prevParam * flatTo3d;
 			btScalar exitParam3d = rs.param * flatTo3d;
 			enterPos = rayBegin + rayDir * enterParam3d;
@@ -700,10 +700,10 @@ void btHeightfieldTerrainShape::performRaycast(btTriangleCallback* callback, con
 		indices[1] = 2;
 		indices[2] = 1;
 	}
-	int iBeginX = static_cast<int>(floor(beginPos[indices[0]]));
-	int iBeginZ = static_cast<int>(floor(beginPos[indices[2]]));
-	int iEndX = static_cast<int>(floor(endPos[indices[0]]));
-	int iEndZ = static_cast<int>(floor(endPos[indices[2]]));
+	int iBeginX = (Q::Floor(beginPos[indices[0]]).ToInt());
+	int iBeginZ = (Q::Floor(beginPos[indices[2]]).ToInt());
+	int iEndX = (Q::Floor(endPos[indices[0]]).ToInt());
+	int iEndZ = (Q::Floor(endPos[indices[2]]).ToInt());
 
 	if (iBeginX == iEndX && iBeginZ == iEndZ)
 	{

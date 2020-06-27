@@ -62,9 +62,9 @@ void btCylinderShape::calculateLocalInertia(btScalar mass, btVector3& inertia) c
 	btScalar radius2;                                    // square of cylinder radius
 	btScalar height2;                                    // square of cylinder height
 	btVector3 halfExtents = getHalfExtentsWithMargin();  // get cylinder dimension
-	btScalar div12 = mass / 12.f;
-	btScalar div4 = mass / 4.f;
-	btScalar div2 = mass / 2.f;
+	btScalar div12 = mass / btScalar(12);
+	btScalar div4 = mass / btScalar(4);
+	btScalar div2 = mass / btScalar(2);
 	int idxRadius, idxHeight;
 
 	switch (m_upAxis)  // get indices of radius and height of cylinder
@@ -136,14 +136,14 @@ SIMD_FORCE_INLINE btVector3 CylinderLocalSupportX(const btVector3& halfExtents, 
 	{
 		d = radius / s;
 		tmp[XX] = v[XX] * d;
-		tmp[YY] = v[YY] < 0.0 ? -halfHeight : halfHeight;
+		tmp[YY] = v[YY] < btScalar(0) ? -halfHeight : halfHeight;
 		tmp[ZZ] = v[ZZ] * d;
 		return tmp;
 	}
 	else
 	{
 		tmp[XX] = radius;
-		tmp[YY] = v[YY] < 0.0 ? -halfHeight : halfHeight;
+		tmp[YY] = v[YY] < btScalar(0) ? -halfHeight : halfHeight;
 		tmp[ZZ] = btScalar(0.0);
 		return tmp;
 	}
@@ -167,14 +167,14 @@ inline btVector3 CylinderLocalSupportY(const btVector3& halfExtents, const btVec
 	{
 		d = radius / s;
 		tmp[XX] = v[XX] * d;
-		tmp[YY] = v[YY] < 0.0 ? -halfHeight : halfHeight;
+		tmp[YY] = v[YY] < btScalar(0) ? -halfHeight : halfHeight;
 		tmp[ZZ] = v[ZZ] * d;
 		return tmp;
 	}
 	else
 	{
 		tmp[XX] = radius;
-		tmp[YY] = v[YY] < 0.0 ? -halfHeight : halfHeight;
+		tmp[YY] = v[YY] < btScalar(0) ? -halfHeight : halfHeight;
 		tmp[ZZ] = btScalar(0.0);
 		return tmp;
 	}
@@ -201,14 +201,14 @@ inline btVector3 CylinderLocalSupportZ(const btVector3& halfExtents, const btVec
 	{
 		d = radius / s;
 		tmp[XX] = v[XX] * d;
-		tmp[YY] = v[YY] < 0.0 ? -halfHeight : halfHeight;
+		tmp[YY] = v[YY] < btScalar(0) ? -halfHeight : halfHeight;
 		tmp[ZZ] = v[ZZ] * d;
 		return tmp;
 	}
 	else
 	{
 		tmp[XX] = radius;
-		tmp[YY] = v[YY] < 0.0 ? -halfHeight : halfHeight;
+		tmp[YY] = v[YY] < btScalar(0) ? -halfHeight : halfHeight;
 		tmp[ZZ] = btScalar(0.0);
 		return tmp;
 	}

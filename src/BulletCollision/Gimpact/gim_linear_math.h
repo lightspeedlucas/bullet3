@@ -268,7 +268,7 @@ email: projectileman@yahoo.com
 	{                              \
 		GREAL len;                 \
 		VEC_INV_LENGTH(a, len);    \
-		if (len < G_REAL_INFINITY) \
+		if (len < btScalar(G_REAL_INFINITY)) \
 		{                          \
 			a[0] *= len;           \
 			a[1] *= len;           \
@@ -281,7 +281,7 @@ email: projectileman@yahoo.com
 	{                              \
 		GREAL len;                 \
 		VEC_INV_LENGTH(a, len);    \
-		if (len < G_REAL_INFINITY) \
+		if (len < btScalar(G_REAL_INFINITY)) \
 		{                          \
 			len *= newlen;         \
 			a[0] *= len;           \
@@ -359,7 +359,7 @@ Takes two vectors a, b, blends them together with two scalars */
 
 /*! Vector blending
 Takes two vectors a, b, blends them together with s <=1 */
-#define VEC_BLEND(vr, a, b, s) VEC_BLEND_AB(vr, (1 - s), a, s, b)
+#define VEC_BLEND(vr, a, b, s) VEC_BLEND_AB(vr, (btScalar(1) - s), a, s, b)
 
 #define VEC_SET3(a, b, op, c) \
 	a[0] = b[0] op c[0];      \

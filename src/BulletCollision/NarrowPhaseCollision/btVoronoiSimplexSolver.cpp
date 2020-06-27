@@ -137,7 +137,7 @@ bool btVoronoiSimplexSolver::updateClosestVectorAndPoints()
 					//reduce to 1 point
 					m_cachedBC.m_usedVertices.usedVertexA = true;
 				}
-				m_cachedBC.setBarycentricCoordinates(1 - t, t);
+				m_cachedBC.setBarycentricCoordinates(btScalar(1) - t, t);
 				nearest = from + t * v;
 
 				m_cachedP1 = m_simplexPointsP[0] + t * (m_simplexPointsP[1] - m_simplexPointsP[0]);
@@ -348,7 +348,7 @@ bool btVoronoiSimplexSolver::closestPtPointTriangle(const btVector3& p, const bt
 		result.m_closestPointOnSimplex = a + v * ab;
 		result.m_usedVertices.usedVertexA = true;
 		result.m_usedVertices.usedVertexB = true;
-		result.setBarycentricCoordinates(1 - v, v, 0);
+		result.setBarycentricCoordinates(btScalar(1) - v, v, 0);
 		return true;
 		//return a + v * ab; // barycentric coordinates (1-v,v,0)
 	}
@@ -373,7 +373,7 @@ bool btVoronoiSimplexSolver::closestPtPointTriangle(const btVector3& p, const bt
 		result.m_closestPointOnSimplex = a + w * ac;
 		result.m_usedVertices.usedVertexA = true;
 		result.m_usedVertices.usedVertexC = true;
-		result.setBarycentricCoordinates(1 - w, 0, w);
+		result.setBarycentricCoordinates(btScalar(1) - w, 0, w);
 		return true;
 		//return a + w * ac; // barycentric coordinates (1-w,0,w)
 	}
@@ -387,7 +387,7 @@ bool btVoronoiSimplexSolver::closestPtPointTriangle(const btVector3& p, const bt
 		result.m_closestPointOnSimplex = b + w * (c - b);
 		result.m_usedVertices.usedVertexB = true;
 		result.m_usedVertices.usedVertexC = true;
-		result.setBarycentricCoordinates(0, 1 - w, w);
+		result.setBarycentricCoordinates(0, btScalar(1) - w, w);
 		return true;
 		// return b + w * (c - b); // barycentric coordinates (0,1-w,w)
 	}
@@ -401,7 +401,7 @@ bool btVoronoiSimplexSolver::closestPtPointTriangle(const btVector3& p, const bt
 	result.m_usedVertices.usedVertexA = true;
 	result.m_usedVertices.usedVertexB = true;
 	result.m_usedVertices.usedVertexC = true;
-	result.setBarycentricCoordinates(1 - v - w, v, w);
+	result.setBarycentricCoordinates(btScalar(1) - v - w, v, w);
 
 	return true;
 	//	return a + ab * v + ac * w; // = u*a + v*b + w*c, u = va * denom = btScalar(1.0) - v - w
@@ -462,7 +462,7 @@ bool btVoronoiSimplexSolver::closestPtPointTetrahedron(const btVector3& p, const
 		return false;
 	}
 
-	btScalar bestSqDist = FLT_MAX;
+	btScalar bestSqDist = btScalar(99999999999LL);
 	// If point outside face abc then compute closest point on abc
 	if (pointOutsideABC)
 	{

@@ -51,7 +51,7 @@ email: projectileman@yahoo.com
 #define G_ROOT3 1.73205f
 #define G_ROOT2 1.41421f
 #define G_UINT_INFINITY 0xffffffff  //!< A very very high value
-#define G_REAL_INFINITY FLT_MAX
+#define G_REAL_INFINITY 0x7FFFFFFFFFFFLL
 #define G_SIGN_BITMASK 0x80000000
 #define G_EPSILON SIMD_EPSILON
 
@@ -111,23 +111,20 @@ enum GIM_SCALAR_TYPES
 
 #define GIM_INV_SQRT(va, isva)                         \
 	{                                                  \
-		if (va <= 0.0000001f)                          \
+		if (va <= btScalar(0.0000001f))                          \
 		{                                              \
 			isva = G_REAL_INFINITY;                    \
 		}                                              \
 		else                                           \
 		{                                              \
-			GREAL _x = va * 0.5f;                      \
-			GUINT _y = 0x5f3759df - (GIM_IR(va) >> 1); \
-			isva = GIM_FR(_y);                         \
-			isva = isva * (1.5f - (_x * isva * isva)); \
+			isva = btScalar(1) / btSqrt(va);           \
 		}                                              \
 	}
 
 #define GIM_SQRT(va, sva)      \
 	{                          \
 		GIM_INV_SQRT(va, sva); \
-		sva = 1.0f / sva;      \
+		sva = btScalar(1) / sva;      \
 	}
 
 //! Computes 1.0f / sqrtf(x). Comes from Quake3. See http://www.magic-software.com/3DGEDInvSqrt.html

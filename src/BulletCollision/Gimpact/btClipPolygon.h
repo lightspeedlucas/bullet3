@@ -36,7 +36,7 @@ SIMD_FORCE_INLINE btScalar bt_distance_point_plane(const btVector4 &plane, const
 Takes two vectors a, b, blends them together*/
 SIMD_FORCE_INLINE void bt_vec_blend(btVector3 &vr, const btVector3 &va, const btVector3 &vb, btScalar blend_factor)
 {
-	vr = (1 - blend_factor) * va + blend_factor * vb;
+	vr = (btScalar(1) - blend_factor) * va + blend_factor * vb;
 }
 
 //! This function calcs the distance from a 3D plane
@@ -48,8 +48,8 @@ SIMD_FORCE_INLINE void bt_plane_clip_polygon_collect(
 	btVector3 *clipped,
 	int &clipped_count)
 {
-	bool _prevclassif = (dist0 > SIMD_EPSILON);
-	bool _classif = (dist1 > SIMD_EPSILON);
+	bool _prevclassif = (dist0 > btScalar(SIMD_EPSILON));
+	bool _classif = (dist1 > btScalar(SIMD_EPSILON));
 	if (_classif != _prevclassif)
 	{
 		btScalar blendfactor = -dist0 / (dist1 - dist0);
@@ -78,7 +78,7 @@ SIMD_FORCE_INLINE int bt_plane_clip_polygon(
 	//clip first point
 	btScalar firstdist = bt_distance_point_plane(plane, polygon_points[0]);
 	;
-	if (!(firstdist > SIMD_EPSILON))
+	if (!(firstdist > btScalar(SIMD_EPSILON)))
 	{
 		clipped[clipped_count] = polygon_points[0];
 		clipped_count++;
@@ -129,7 +129,7 @@ SIMD_FORCE_INLINE int bt_plane_clip_triangle(
 	//clip first point0
 	btScalar firstdist = bt_distance_point_plane(plane, point0);
 	;
-	if (!(firstdist > SIMD_EPSILON))
+	if (!(firstdist > btScalar(SIMD_EPSILON)))
 	{
 		clipped[clipped_count] = point0;
 		clipped_count++;

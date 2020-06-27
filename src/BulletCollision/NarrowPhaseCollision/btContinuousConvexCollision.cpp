@@ -141,7 +141,7 @@ bool btContinuousConvexCollision::calcTimeOfImpact(
 		dist = pointCollector1.m_distance + result.m_allowedPenetration;
 		n = pointCollector1.m_normalOnBInWorld;
 		btScalar projectedLinearVelocity = relLinVel.dot(n);
-		if ((projectedLinearVelocity + maxAngularProjectedVelocity) <= SIMD_EPSILON)
+		if ((projectedLinearVelocity + maxAngularProjectedVelocity) <= btScalar(SIMD_EPSILON))
 			return false;
 
 		if (dist < btScalar(0))
@@ -159,7 +159,7 @@ bool btContinuousConvexCollision::calcTimeOfImpact(
 			projectedLinearVelocity = relLinVel.dot(n);
 
 			//don't report time of impact for motion away from the contact normal (or causes minor penetration)
-			if ((projectedLinearVelocity + maxAngularProjectedVelocity) <= SIMD_EPSILON)
+			if ((projectedLinearVelocity + maxAngularProjectedVelocity) <= btScalar(SIMD_EPSILON))
 				return false;
 
 			dLambda = dist / (projectedLinearVelocity + maxAngularProjectedVelocity);

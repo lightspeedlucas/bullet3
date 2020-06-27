@@ -73,7 +73,7 @@ public:
 		if (getMargin() != btScalar(0.))
 		{
 			btVector3 vecnorm = vec;
-			if (vecnorm.length2() < (SIMD_EPSILON * SIMD_EPSILON))
+			if (vecnorm.length2() < btScalar(SIMD_EPSILON) * btScalar(SIMD_EPSILON))
 			{
 				vecnorm.setValue(btScalar(-1.), btScalar(-1.), btScalar(-1.));
 			}

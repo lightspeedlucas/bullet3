@@ -132,7 +132,7 @@ bool btMinkowskiPenetrationDepthSolver::calcPenDepth(btSimplexSolverInterface& s
 		{
 			norm[2] = 0.f;
 		}
-		if (norm.length2() > 0.01)
+		if (norm.length2() > btScalar(0.01))
 		{
 			separatingAxisInA = separatingAxisInABatch[i];
 			separatingAxisInB = separatingAxisInBBatch[i];

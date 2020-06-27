@@ -93,7 +93,7 @@ struct GIM_TRIANGLE_CONTACT_DATA
 					point_indices[0] = _k;
 					m_point_count = 1;
 				}
-				else if ((_dist + G_EPSILON) >= m_penetration_depth)
+				else if ((_dist + btScalar(G_EPSILON)) >= m_penetration_depth)
 				{
 					point_indices[m_point_count] = _k;
 					m_point_count++;
@@ -249,7 +249,7 @@ if 0.0<= u+v <=1.0 then they are inside of triangle
 		btVector3 _vecproj = point - m_vertices[0];
 		GUINT _i1 = (tri_plane.closestAxis() + 1) % 3;
 		GUINT _i2 = (_i1 + 1) % 3;
-		if (btFabs(_axe2[_i2]) < G_EPSILON)
+		if (btFabs(_axe2[_i2]) < btScalar(G_EPSILON))
 		{
 			u = (_vecproj[_i2] * _axe2[_i1] - _vecproj[_i1] * _axe2[_i2]) / (_axe1[_i2] * _axe2[_i1] - _axe1[_i1] * _axe2[_i2]);
 			v = (_vecproj[_i1] - u * _axe1[_i1]) / _axe2[_i1];
@@ -260,11 +260,11 @@ if 0.0<= u+v <=1.0 then they are inside of triangle
 			v = (_vecproj[_i2] - u * _axe1[_i2]) / _axe2[_i2];
 		}
 
-		if (u < -G_EPSILON)
+		if (u < -btScalar(G_EPSILON))
 		{
 			return false;
 		}
-		else if (v < -G_EPSILON)
+		else if (v < -btScalar(G_EPSILON))
 		{
 			return false;
 		}
@@ -272,11 +272,11 @@ if 0.0<= u+v <=1.0 then they are inside of triangle
 		{
 			btScalar sumuv;
 			sumuv = u + v;
-			if (sumuv < -G_EPSILON)
+			if (sumuv < -btScalar(G_EPSILON))
 			{
 				return false;
 			}
-			else if (sumuv - 1.0f > G_EPSILON)
+			else if (sumuv - btScalar(1) > btScalar(G_EPSILON))
 			{
 				return false;
 			}

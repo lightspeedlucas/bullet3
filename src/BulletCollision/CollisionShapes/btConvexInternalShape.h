@@ -158,7 +158,8 @@ SIMD_FORCE_INLINE const char* btConvexInternalShape::serialize(void* dataBuffer,
 
 	m_implicitShapeDimensions.serializeFloat(shapeData->m_implicitShapeDimensions);
 	m_localScaling.serializeFloat(shapeData->m_localScaling);
-	shapeData->m_collisionMargin = float(m_collisionMargin);
+	float temp = this->m_collisionMargin.ToFloat();
+	shapeData->m_collisionMargin = temp;
 
 	// Fill padding with zeros to appease msan.
 	shapeData->m_padding = 0;

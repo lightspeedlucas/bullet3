@@ -86,7 +86,7 @@ inline void GrahamScanConvexHull2D(btAlignedObjectArray<GrahamVector3>& original
 		btVector3 ar = originalPoints[i] - originalPoints[0];
 		btScalar ar1 = axis1.dot(ar);
 		btScalar ar0 = axis0.dot(ar);
-		if (ar1 * ar1 + ar0 * ar0 < FLT_EPSILON)
+		if (ar1 * ar1 + ar0 * ar0 < btScalar(SIMD_EPSILON))
 		{
 			originalPoints[i].m_angle = 0.0f;
 		}
