@@ -487,18 +487,7 @@ public:
 
 	static Q ReciprocalSqrt(Q S)
 	{
-		// Newton-Raphson method
-		// Initial guess
-		Q Res = FromRaw(S.Value >> 1); // S / 2
-
-		// Five steps
-		for (int i = 0; i < 5; i++)
-		{
-			// x2 = x1 * (1.5 - 0.5 * a * x1^2)
-			Res = Res * (Q(1.5f) - Q(0.5f) * S * Res * Res);
-		}
-
-		return Res;
+		return Q(1) / Sqrt(S);
 	}
 
 	static Q Sqrt(Q S)
