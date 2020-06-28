@@ -541,7 +541,7 @@ public:
 		}
 		else
 		{
-			Frac = Q(0);
+			Frac = Q(1);
 		}
 
 		Q Total = Integral * Frac;
