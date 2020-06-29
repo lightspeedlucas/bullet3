@@ -492,6 +492,11 @@ public:
 
 	static Q Sqrt(Q S)
 	{
+		if (S == Q(0))
+		{
+			return Q(0);
+		}
+		
 		// Initial guess
 		Q Res = FromRaw(S.Value >> 1); // S / 2
 
