@@ -47,7 +47,7 @@ btBoxBoxDetector::btBoxBoxDetector(const btBoxShape* box1, const btBoxShape* box
 // fields.
 struct dContactGeom;
 #define dDOTpq(a, b, p, q) ((a)[0] * (b)[0] + (a)[p] * (b)[q] + (a)[2 * (p)] * (b)[2 * (q)])
-#define dInfinity 999999999999
+#define dInfinity 99999999999LL
 
 /*PURE_INLINE btScalar dDOT   (const btScalar *a, const btScalar *b) { return dDOTpq(a,b,1,1); }
 PURE_INLINE btScalar dDOT13 (const btScalar *a, const btScalar *b) { return dDOTpq(a,b,1,3); }
