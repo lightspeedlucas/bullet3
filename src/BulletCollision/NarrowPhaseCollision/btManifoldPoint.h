@@ -61,7 +61,9 @@ public:
 		  m_contactMotion1(0.f),
 		  m_contactMotion2(0.f),
 		  m_contactCFM(0.f),
+		  m_combinedContactStiffness1(0.f),
 		  m_contactERP(0.f),
+		  m_combinedContactDamping1(0.f),
 		  m_frictionCFM(0.f),
 		  m_lifeTime(0)
 	{
@@ -86,7 +88,9 @@ public:
 										 m_contactMotion1(0.f),
 										 m_contactMotion2(0.f),
 										 m_contactCFM(0.f),
+										 m_combinedContactStiffness1(0.f),
 										 m_contactERP(0.f),
+										 m_combinedContactDamping1(0.f),
 										 m_frictionCFM(0.f),
 										 m_lifeTime(0)
 	{
